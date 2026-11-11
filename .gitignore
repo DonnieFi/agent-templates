@@ -1,0 +1,27 @@
+# Environment & secrets
+.env
+.env.*
+!.env.example
+*.env
+*.key
+*.pem
+
+# Dependencies & caches
+node_modules/
+__pycache__/
+*.pyc
+.cache/
+.pytest_cache/
+
+# OS metadata
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
+
+# IDE / Editor folders
+.idea/
+.vscode/
+*.sublime-project
+*.sublime-workspace
