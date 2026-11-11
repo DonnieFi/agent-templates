@@ -38,6 +38,9 @@ not current travel advice.
 7. Collision negative case: preview refused to overwrite a same-named MCP server
    with a different literal-path configuration. Setup documentation was corrected
    to provision the executable/config first and let Add register its declaration.
+8. Source hosting and review: GitHub repository created at
+   https://github.com/DonnieFi/agent-templates with draft PR #1
+   (https://github.com/DonnieFi/agent-templates/pull/1) opened against main.
 
 ## Findings applied to instructions
 
@@ -61,7 +64,7 @@ not current travel advice.
 - Broader-agency fixtures, midnight/branch/cancellation conversation scenarios,
   and empirical catchability quality. The acceptance document is a plan, not a
   test-result list.
-- GitHub repository creation/PR, ClawHub publication, and showcase posting.
+- ClawHub publication and community showcase posting.
 
 No live Add, account setup, scheduled job, family-location tracking, or external
 publication was performed. The test MCP children terminated after each check.

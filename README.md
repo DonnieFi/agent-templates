@@ -2,14 +2,14 @@
 
 Portable OpenClaw agents built around useful everyday jobs.
 
-Each folder under `templates/` is a standalone, independently versioned template. This source repository is separate from ClawHub publication: reviewing or merging source does not publish a registry package or install an agent.
+Packages under `templates/` represent agent templates for OpenClaw. In this collection, [Hopper](templates/hopper/) is the current-format, independently versioned OpenClaw Template package; [starter-agent](templates/starter-agent/) is a legacy scaffold (retaining `agent.json` and `prompts/system.md` rather than an installable OpenClaw `CLAW.md`/`package.json` manifest). This source repository is separate from ClawHub publication: reviewing or merging source does not publish a registry package or install an agent.
 
 ## Available Templates
 
 | Template | Description | Status |
 | :--- | :--- | :--- |
 | [**Hopper**](templates/hopper/) | Catch the right ride: conversational transit companion with stop/direction-aware departures, walking buffers, and live vs. scheduled status | Draft / Pilot |
-| [**Starter Agent**](templates/starter-agent/) | Minimal scaffold for building custom autonomous agents | Ready |
+| [**Starter Agent**](templates/starter-agent/) | Minimal scaffold for building custom autonomous agents | Legacy scaffold—not installable |
 
 ### Hopper — Catch the right ride
 
@@ -20,7 +20,7 @@ Each folder under `templates/` is a standalone, independently versioned template
 ## Repository Layout
 
 - `templates/hopper/`: Hopper's complete package source.
-- `templates/starter-agent/`: Minimal starter template scaffold.
+- `templates/starter-agent/`: Legacy starter scaffold (not an installable OpenClaw Template package).
 - `templates/<another-agent>/`: Future independent packages.
 - `docs/VERIFICATION.md`: Observed evidence and outstanding checks.
 - `AGENTS.md`: Portable template collection guidance.
