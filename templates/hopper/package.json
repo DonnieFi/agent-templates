@@ -1,0 +1,9 @@
+{
+  "name": "hopper-transit-companion",
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Hopper — Catch the right ride.",
+  "openclaw": {
+    "template": "CLAW.md"
+  }
+}

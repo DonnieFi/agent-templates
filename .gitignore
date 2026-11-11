@@ -1,17 +1,29 @@
-# Environment & secrets
-.env
-.env.*
-!.env.example
-*.env
-*.key
-*.pem
-
-# Dependencies & caches
-node_modules/
+# Local artifacts, distributions, and external runtimes
+/dist/
+/node_modules/
+**/node_modules/
+*.tgz
+*.tar.gz
+*.zip
+*.sqlite
+*.sqlite3
+*.db
+*.db-shm
+*.db-wal
 __pycache__/
 *.pyc
 .cache/
 .pytest_cache/
+
+# Personal runtime state and credentials
+/private/
+**/private/
+.env
+.env.*
+!.env.example
+*.key
+*.pem
+.openclaw/
 
 # OS metadata
 .DS_Store
