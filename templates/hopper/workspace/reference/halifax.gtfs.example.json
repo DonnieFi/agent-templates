@@ -1,0 +1,23 @@
+{
+  "systems": [
+    {
+      "id": "halifax",
+      "name": "Halifax Transit",
+      "schedule_url": "https://gtfs.halifax.ca/static/google_transit.zip",
+      "timezone": "America/Halifax",
+      "realtime": {
+        "trip_updates": [
+          "https://gtfs.halifax.ca/realtime/TripUpdate/TripUpdates.pb"
+        ],
+        "vehicle_positions": [
+          "https://gtfs.halifax.ca/realtime/Vehicle/VehiclePositions.pb"
+        ],
+        "alerts": []
+      },
+      "auth": null
+    }
+  ],
+  "data_dir": "~/.hopper/gtfs-data",
+  "schedule_refresh_hours": 24,
+  "pre_warm_database": "setup"
+}
