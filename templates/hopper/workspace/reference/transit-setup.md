@@ -13,7 +13,7 @@ Hopper bundles the `hopper-gtfs` plugin under `plugins/gtfs/`:
 - **Plugin ID**: `hopper-gtfs`
 - **Candidate version**: `0.1.0-dev.3`
 - **Source repository**: `https://github.com/DonnieFi/openclaw-gtfs`
-- **Source commit**: `ba65c1d` (commit `ba65c1d4287841ee1a18ea0b3f15f6fc10ca8b99`)
+- **Source commit**: `ba65c1d` (commit `ba65c1db45d63dd94743e4371bb37bad57f87093`)
 - **Package artifact SHA-256**: `c51cbc87d5f94e382940be0044b412da539a6abb9323943174f6507c58e98c7d` (`hopper-gtfs-plugin-0.1.0-dev.3.tgz`)
 
 ### Manifest Declaration
@@ -46,7 +46,7 @@ The plugin exposes six native tools under `profile: minimal`:
    Searches for stops by name or exact public stop ID.
 5. **`get_transit_departures({ stop_id, route_id?, limit? })`**:
    Queries live vehicle and trip updates. Returns predicted departures with ISO
-   timestamps, `trip_headsign`, stop sequence, feed age, and agency timezone.
+   timestamps, `headsign`, stop sequence, feed age, and agency timezone.
 6. **`get_transit_vehicles({ route_id?, limit? })`**:
    Queries current public vehicle locations, headings, and speeds.
 

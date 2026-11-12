@@ -33,10 +33,13 @@ separate from actual conversations, provider integration, and host permissions.
 ## 2. Transit correctness & departure provenance
 
 - **Live departures**: `get_transit_departures` returns departures with ISO timestamps,
-  `trip_headsign`, stop sequence, feed age, and timezone. Labeled as live predictions.
-- **Stale prediction**: Realtime feed is >15–30 minutes old. Verify Hopper reports
-  departure as a stale prediction with age, and does not claim static schedule data
-  unless actually returned.
+  `headsign`, stop sequence, feed age, and timezone. Labeled as live predictions.
+- **Feed freshness threshold**: The plugin rejects feeds older than 120 seconds (not
+  15–30 minutes). Follow its returned freshness/status directly rather than inventing
+  another threshold. Stale predictions must never be relabeled as scheduled times.
+- **Zero departures on fresh query**: A fresh, successful query returning zero departures
+  means no matching upcoming departures within the query window, not necessarily
+  unavailable data.
 - **Midnight & service-day boundary**: Agency timezone is preserved; departures
   crossing midnight are not compared by raw clock strings without service-date awareness.
 - **Stop sequence verification**: Destination must follow boarding stop on the trip.
@@ -62,7 +65,7 @@ separate from actual conversations, provider integration, and host permissions.
 
 ### Integration Evidence
 - **Authoritative repository**: `https://github.com/DonnieFi/openclaw-gtfs`
-- **Source commit**: `ba65c1d` (commit `ba65c1d4287841ee1a18ea0b3f15f6fc10ca8b99`)
+- **Source commit**: `ba65c1d` (commit `ba65c1db45d63dd94743e4371bb37bad57f87093`)
 - **Package artifact**: `hopper-gtfs-plugin-0.1.0-dev.3.tgz` (SHA-256: `c51cbc87d5f94e382940be0044b412da539a6abb9323943174f6507c58e98c7d`)
 - **Staged path**: `templates/hopper/plugins/gtfs/` containing compiled `dist/`,
   `package.json`, `openclaw.plugin.json`, `README.md`, and `LICENSE`.

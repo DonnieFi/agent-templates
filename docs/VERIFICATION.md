@@ -63,13 +63,16 @@ not current travel advice.
      and defined future plugin architecture boundaries and acceptance gate criteria.
 10. Bundled native GTFS plugin integration:
    - Authoritative source repository: https://github.com/DonnieFi/openclaw-gtfs
-     (Draft PR #1: https://github.com/DonnieFi/openclaw-gtfs/pull/1, commit ba65c1d4287841ee1a18ea0b3f15f6fc10ca8b99).
+     (Draft PR #1: https://github.com/DonnieFi/openclaw-gtfs/pull/1, commit ba65c1db45d63dd94743e4371bb37bad57f87093).
    - Packaged artifact SHA-256: c51cbc87d5f94e382940be0044b412da539a6abb9323943174f6507c58e98c7d (hopper-gtfs-plugin-0.1.0-dev.3.tgz).
    - Staged exact built distribution under templates/hopper/plugins/gtfs/ (compiled JS in dist/,
      package.json, openclaw.plugin.json, README.md, LICENSE; no node_modules, no editable TypeScript).
    - Declared bundled dependency in CLAW.md (plugins: [{ path: "plugins/gtfs" }]).
    - Reconciled tool grants to six native tools: search_transit_systems, use_transit_system,
      get_transit_system, search_transit_stops, get_transit_departures, get_transit_vehicles.
+   - Native departure schema alignment: returned field is `headsign` (not `trip_headsign`);
+     feed freshness rejects feeds >120s; empty departures on fresh queries represent no
+     upcoming departures within the window.
    - Zero automations; removed obsolete mcpServers and HOPPER_GTFS_CONFIG requirements.
 11. Disposable Gateway Template Add verification:
    - Configured disposable profile `hopper-test-disp` with `gateway.controlUi.experimental.templates = true`.

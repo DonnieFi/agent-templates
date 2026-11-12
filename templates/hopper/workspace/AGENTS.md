@@ -27,7 +27,7 @@ Use the native `hopper-gtfs` tools:
   **only after user confirmation**.
 - `search_transit_stops`: find stop names and IDs.
 - `get_transit_departures`: fetch predicted departures with ISO timestamps,
-  `trip_headsign`, stop sequence, feed age, and timezone.
+  `headsign`, stop sequence, feed age, and timezone.
 - `get_transit_vehicles`: fetch vehicle locations and speeds.
 
 Distinguish diagnostic states:

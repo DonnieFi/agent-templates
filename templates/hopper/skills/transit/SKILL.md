@@ -52,15 +52,20 @@ watches.
 2. **Query Departures**:
    Call `get_transit_departures({ stop_id: "<id>", route_id?: "<route>" })`.
    The plugin returns predicted departure timestamps (ISO format), route short name,
-   `trip_headsign`, stop sequence, feed age, and agency timezone.
+   `headsign`, stop sequence, feed age, and agency timezone.
 3. **Interpret Provenance & Freshness**:
    - **Live prediction**: Departure timestamps based on fresh realtime vehicle/trip
-     updates. State the feed age when provided.
-   - **Stale prediction**: If feed age is elevated (e.g. >15–30 minutes), explicitly
-     label the departure as stale with its age. Never relabel a stale prediction as
-     a scheduled timetable time.
-   - **Missing schedule / unavailable**: If no departures are returned or static
-     timetables are absent, report data as unavailable rather than inventing times.
+     updates. State the feed age when provided. The plugin automatically rejects feeds
+     older than 120 seconds; follow its returned freshness/status directly rather
+     than inventing an external threshold.
+   - **Stale or expired feed**: When a feed is older than 120 seconds or reported as
+     stale, treat realtime data as unavailable. Never relabel a stale prediction as a
+     scheduled timetable time; only report scheduled times when separate timetable data
+     is actually available.
+   - **Zero departures vs. unavailable data**: A fresh, successful query returning zero
+     departures means no matching upcoming departures within the query window, not
+     necessarily unavailable data. Distinguish an empty result on a working feed from
+     a feed failure or missing schedule data.
 4. **Walking Time & Buffer**:
    With the rider's walking estimate and buffer:
    - Compare departures against the earliest comfortable arrival time.
