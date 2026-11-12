@@ -50,10 +50,17 @@ not current travel advice.
    - Reconciled tool grants in `CLAW.md` to concrete transit tool names without
      wildcards or shell access.
    - Updated `BOOTSTRAP.md`, `skills/transit/SKILL.md`, and operating rules to
-     check exposed capabilities before commute setup and distinguish the four
-     diagnostic states (ready, unconfigured city, blocked by policy, no visible tools).
-   - Documented in-progress status of the native OpenClaw GTFS plugin without
-     fictional URLs or unverified package names.
+     check exposed capabilities before commute setup, reuse facts already supplied,
+     and distinguish evidence-based diagnostic states (ready, unconfigured city,
+     explicit permission denial, connection failure, no visible tools).
+   - Strict departure provenance: distinguish live predictions, scheduled timetable
+     times, stale predictions (with age), and unavailable data; never relabel stale
+     predictions as scheduled.
+   - Corrected operator verification of `gtfs-mcp` v1.0.2 to check source commit
+     and `package.json` version plus MCP protocol handshake (removing unsupported
+     `--version` CLI flag recommendation).
+   - Documented planned Hopper transit plugin status neutrally without fictional URLs,
+     and defined future plugin architecture boundaries and acceptance gate criteria.
 
 ## Findings applied to instructions
 

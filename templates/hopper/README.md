@@ -21,29 +21,32 @@ prefixes.
 
 ## Capability checking & missing dependencies
 
-On first run, Hopper checks for exposed transit tools before beginning commute setup:
-1. **Ready**: If compatible tools are exposed, Hopper performs a harmless read
-   (`list_systems`, feed health) to verify data freshness before asking for stops.
+On first run, Hopper reuses any facts already supplied in the conversation, checks
+for exposed transit tools silently, and asks only for missing details:
+1. **Ready with usable coverage**: Performs a harmless read (`list_systems`, feed health)
+   to verify data freshness before retrieving departures.
 2. **Tools working, city unconfigured**: Lists configured systems; does not guess
    or substitute another agency.
-3. **Tools blocked by policy**: Informs the user that transit tools are provisioned
+3. **Explicit permission denial**: Informs the user that transit tools are provisioned
    on the host Gateway but require explicit tool grants in host policy.
-4. **No visible tools**: Explains that live transit tools are not yet connected.
-   Hopper can still calculate walking time buffers, assess catchability, and
-   interpret transit schedules or timetable text provided by the rider.
-   - An official OpenClaw GTFS plugin is in development (guided installation is
-     not yet published on ClawHub).
-   - Advanced operators can provision an external GTFS MCP server using the qualified
-     `jdamcd/gtfs-mcp` v1.0.2 source-build recipe detailed in `reference/transit-setup.md`.
+4. **Connection or runtime failure**: Explains that the integration process did not
+   respond; directs operators to runtime logs without diagnosing permissions without evidence.
+5. **No visible tools**: Explains that live transit tools are not accessible in the
+   session, without speculating whether software is installed on the host or blocked
+   by policy. Hopper can still calculate walking time buffers, assess catchability,
+   and interpret transit schedules or timetable text provided by the rider.
+   - See `reference/transit-setup.md` for current integration options (including
+     the planned Hopper transit plugin and operator MCP setup).
    - If the rider declines setup, Hopper continues in schedule-interpretation mode
      without nagging.
 
 ## Before Add
 
-Hopper does not bundle an internal GTFS engine or hardcode an unconditional
-MCP server in its manifest. This avoids broken installations or duplicate servers.
-If connecting an external runtime, review `workspace/reference/transit-setup.md`
-for operator provisioning steps.
+Hopper bundles no transit runtime and does not yet make a clean-host Template Add
+produce live departures out of the box. It does not hardcode an unconditional MCP
+server or unverified plugin in its manifest, avoiding broken installations or duplicate
+servers. Review `workspace/reference/transit-setup.md` for current integration options
+and operator provisioning steps.
 
 ## First ride
 
