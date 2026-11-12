@@ -15,28 +15,12 @@ agent:
       - read
       - write
       - edit
-      - hopper-transit__list_systems
-      - hopper-transit__search_stops
-      - hopper-transit__find_nearby_stops
-      - hopper-transit__get_stop
-      - hopper-transit__get_arrivals
-      - hopper-transit__list_routes
-      - hopper-transit__get_route
-      - hopper-transit__get_alerts
-      - hopper-transit__get_vehicles
-      - hopper-transit__get_trip
-      - hopper-transit__get_feed_health
-      - list_systems
-      - search_stops
-      - find_nearby_stops
-      - get_stop
-      - get_arrivals
-      - list_routes
-      - get_route
-      - get_alerts
-      - get_vehicles
-      - get_trip
-      - get_feed_health
+      - search_transit_systems
+      - use_transit_system
+      - get_transit_system
+      - search_transit_stops
+      - get_transit_departures
+      - get_transit_vehicles
     fs:
       workspaceOnly: true
 workspace:
@@ -60,7 +44,8 @@ workspace:
       path: reference/halifax.gtfs.example.json
 skills:
   - path: skills/transit
-plugins: []
+plugins:
+  - path: plugins/gtfs
 ---
 
 # Hopper

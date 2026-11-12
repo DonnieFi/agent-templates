@@ -8,24 +8,23 @@ separate from actual conversations, provider integration, and host permissions.
 ## 1. Conversational continuity & capability onboarding
 
 - **Reusing supplied facts**: Rider opens with starting location and destination;
-  Hopper verifies tools silently and asks only for missing details (e.g. confirming
-  ambiguous stop direction), without restarting the interview.
-- **Ready integration**: Discover visible tools, perform harmless initial read
-  (`list_systems`, feed health), confirm agency and stop, then return a source-labeled
-  departure without questionnaire friction.
-- **Shared location**: Use voluntarily supplied coordinate once; offer nearby boarding
-  stops in confirmed system. Do not assume continuous location access.
+  Hopper verifies tools silently, checks `get_transit_system`, and asks only for
+  missing details without restarting the interview.
+- **Ready integration & preset reuse**: When `get_transit_system` returns active
+  Halifax preset `mdb-734`, Hopper reuses it directly without prompting to re-select
+  an agency.
+- **Agency search & user confirmation**: Rider requests a new city; Hopper searches
+  via `search_transit_systems`, presents candidates, explains any authentication
+  requirements, and requires explicit user confirmation before calling `use_transit_system`.
 - **Explicit permission denial**: When a tool call returns a policy denial, Hopper
   explains the observed restriction and notes the concrete tool grants needed under
   host policy, without demanding wildcard or shell permissions.
 - **Connection or runtime failure**: When a tool call encounters a transport drop,
-  timeout, or crash, Hopper explains the integration did not respond and points to
+  timeout, or crash, Hopper explains the plugin did not respond and points to
   runtime logs, without prescribing permissions without evidence.
 - **No visible transit tools**: Hopper explains access is unavailable, does not
   infer whether software is installed or blocked on the host, offers timetable help,
   and refers to `reference/transit-setup.md`.
-- **Unsupported city**: Name missing coverage and list configured systems; never
-  silently substitute another city (e.g. Halifax).
 - **User declines setup**: Gracefully proceed using rider-provided schedules without
   nagging or repeating configuration prompts.
 
@@ -33,72 +32,47 @@ separate from actual conversations, provider integration, and host permissions.
 
 ## 2. Transit correctness & departure provenance
 
-- **Stale prediction differs from scheduled time**: Feed is 48m old; realtime update
-  predicts 17:18, scheduled timetable is 17:15. Verify Hopper reports both with distinct
-  labels (17:18 stale prediction, 17:15 scheduled timetable), recommends the scheduled
-  time with extra buffer, and never relabels the 17:18 prediction as a schedule.
-- **Stale prediction with no schedule available**: Realtime update is stale and no
-  static timetable entry exists. Verify Hopper labels the time as a stale prediction
-  and does not manufacture a scheduled timetable time.
-- **Fresh realtime vs. schedule**: Clearly distinguish live vehicle predictions from
-  scheduled timetable departures.
+- **Live departures**: `get_transit_departures` returns departures with ISO timestamps,
+  `trip_headsign`, stop sequence, feed age, and timezone. Labeled as live predictions.
+- **Stale prediction**: Realtime feed is >15–30 minutes old. Verify Hopper reports
+  departure as a stale prediction with age, and does not claim static schedule data
+  unless actually returned.
 - **Midnight & service-day boundary**: Agency timezone is preserved; departures
   crossing midnight are not compared by raw clock strings without service-date awareness.
-- **Opposite-direction vehicle closer**: Don't recommend it for this destination.
-- **Route ID differs from route number**: Preserve ID and display the real short name.
-- **Boarding stop follows destination**: Reject that direct-trip option using `get_route`/`get_trip`.
-- **Bus already passed boarding stop**: Don't recommend it because it's physically nearby.
+- **Stop sequence verification**: Destination must follow boarding stop on the trip.
 - **Walking time 8 minutes, buffer 3, departure in 7**: Not comfortably catchable.
 - **Rounding uncertainty**: Account for rounded relative minutes and elapsed query time;
   for tight margins inside uncertainty, recommend the later option.
 - **Missing walking time**: Show departures, not a confident leave-now instruction.
-- **Alert feed absent**: Don't infer there are no disruptions.
 
 ---
 
 ## 3. Scope and privacy
 
-- **Watch requested**: No “tracking started” without an implemented active watch.
-- **Private delivery fails**: Never post a rider's information to a shared channel.
-- **Bus reaches destination**: No claim that a person arrived safely.
-- **Shared workspace / no private store**: Don't persist personal commute data there.
-- **Restart during setup**: Reuse known facts; don't falsely mark setup complete.
+- **No alert queries**: Disruption alert feeds are not queried; lack of alerts is
+  not an all-clear.
+- **No journey planning**: Direct boarding-stop departures only.
+- **No background watches**: On demand only; no "tracking started" promises.
+- **Private delivery & storage**: Only persist personal commute preferences in a
+  verified private store. No personal records in shared files.
 
 ---
 
-## 4. Future Plugin Architecture Boundary & Acceptance Gate
+## 4. Bundled Plugin Integration & Acceptance Criteria
 
-### Architecture Boundary
-- **Hopper owns**: Conversation flow, schedule/prediction interpretation, walking
-  buffer calculations, and rider choices.
-- **The transit plugin owns**: Runtime dependencies, public GTFS/GTFS-RT feed fetching,
-  SQLite database storage/caching, and structured transit results.
-- **Tool grants**: Exact native tool names and concrete grants must be agreed and
-  verified together. Schema matching cannot expose tools excluded by host policy.
-  Speculative aliases, wildcard grants, and imaginary packages must not be used.
+### Integration Evidence
+- **Authoritative repository**: `https://github.com/DonnieFi/openclaw-gtfs`
+- **Source commit**: `ba65c1d` (commit `ba65c1d4287841ee1a18ea0b3f15f6fc10ca8b99`)
+- **Package artifact**: `hopper-gtfs-plugin-0.1.0-dev.3.tgz` (SHA-256: `c51cbc87d5f94e382940be0044b412da539a6abb9323943174f6507c58e98c7d`)
+- **Staged path**: `templates/hopper/plugins/gtfs/` containing compiled `dist/`,
+  `package.json`, `openclaw.plugin.json`, `README.md`, and `LICENSE`.
 
-### Desired Plugin Output Semantics (Target Specification)
-A future transit plugin should return:
-- Opaque, stable identifiers for systems, routes, trips, and stops.
-- Actual stop sequence and true `trip_headsign` (verified against trip details).
-- Distinct scheduled timetable departure timestamps vs. predicted departure timestamps.
-- Explicit agency timezone metadata.
-- Data freshness / source observation timestamps.
-- Service disruption details (distinguishing cancellations and skipped stops).
-- Alert feed availability status distinctly separate from "no alerts reported".
-
-### Eventual Integration Acceptance Gate
-When a transit plugin candidate is ready, its qualification gate requires:
-1. Fresh disposable Gateway environment.
+### Disposable Gateway Acceptance Gate
+When testing on a disposable Gateway:
+1. Fresh disposable Gateway environment with clean state and separate port.
 2. No pre-existing `gtfs-mcp` binary or `HOPPER_GTFS_CONFIG` environment variable.
-3. No inherited development `node_modules` or global packages.
-4. Normal OpenClaw review and consent flow.
-5. Native plugin dependency resolution and clean installation.
-6. Actual Hopper tool discovery under `profile: minimal`.
-7. Real Halifax stop 8336 departure query producing live and scheduled times.
-8. Verified handling of stale feeds, runtime errors, unknown IDs, timezone boundaries,
-   stop ordering, and missing alerts.
-9. Safe reuse or clean conflict reporting if an integration already exists.
-
-*(This gate represents future integration criteria and is not executed during this
-local documentation patch).*
+3. Add Hopper template through normal source and capability consent.
+4. Verify plugin dependencies (`csv-parse`, `gtfs`, `gtfs-realtime-bindings`, `better-sqlite3`, `typebox`, `yauzl`) install cleanly into the Gateway environment.
+5. Verify all six native tools register under `profile: minimal`.
+6. Complete end-to-end conversation: choose Halifax -> confirm boarding stop -> obtain real departure answer.
+7. Cold restart: verify system selection survives Gateway restart.
