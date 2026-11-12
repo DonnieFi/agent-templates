@@ -1,75 +1,105 @@
 # Transit runtime setup
 
-Hopper uses the existing GTFS MCP server rather than a second transit parser.
-The qualified candidate is jdamcd/gtfs-mcp v1.0.2, source commit
-adaf2222e9f15ef2822a9c8130faaf867448f365:
-https://github.com/jdamcd/gtfs-mcp/releases/tag/v1.0.2
+Hopper uses a native OpenClaw transit plugin to retrieve GTFS catalog data and
+realtime departures. This document explains the bundled plugin architecture, tool
+contracts, and operator verification.
 
-The Template declares command gtfs-mcp and passes GTFS_MCP_CONFIG from the
-HOPPER_GTFS_CONFIG environment reference. The executable and config must be
-available to the receiving Gateway's service account. Installing the Template
-does not install this external runtime. No credentials are needed for the
-Halifax feeds in the included example.
+---
 
-## Operator provisioning
+## 1. Bundled Plugin Integration
 
-A source-build route was exercised in an isolated workspace with Node 24.22.1
-and npm. The upstream engine requirement is Node 22 or newer. After reviewing
-and checking out the exact commit above into an operator-selected runtime folder:
+Hopper bundles the `hopper-gtfs` plugin under `plugins/gtfs/`:
+- **Package name**: `hopper-gtfs-plugin`
+- **Plugin ID**: `hopper-gtfs`
+- **Candidate version**: `0.1.0-dev.3`
+- **Source repository**: `https://github.com/DonnieFi/openclaw-gtfs`
+- **Source commit**: `ba65c1d` (commit `ba65c1db45d63dd94743e4371bb37bad57f87093`)
+- **Package artifact SHA-256**: `c51cbc87d5f94e382940be0044b412da539a6abb9323943174f6507c58e98c7d` (`hopper-gtfs-plugin-0.1.0-dev.3.tgz`)
 
-1. In that folder run npm ci --ignore-scripts --no-audit --no-fund.
-2. Run node node_modules/typescript/bin/tsc.
-3. Install the compiled local folder into an operator-selected prefix using
-   npm install --global --prefix <prefix> --ignore-scripts <runtime-folder>.
-4. Ensure <prefix>/bin is on the Gateway service account's PATH. Verify that
-   gtfs-mcp resolves to that reviewed runtime, not another executable.
+### Manifest Declaration
+Hopper's `CLAW.md` declares the bundled plugin dependency directly:
+```yaml
+plugins:
+  - path: plugins/gtfs
+```
+When an operator adds Hopper to an OpenClaw Gateway with normal review and consent,
+OpenClaw installs the plugin dependencies into the gateway-managed environment.
+No external MCP server (`gtfs-mcp`) or `HOPPER_GTFS_CONFIG` environment variable is
+required.
 
-These are operator actions, not commands to run automatically during rider
-onboarding. Preserve existing installations/configuration. Source updates need
-review and verification, not an implicit latest-version download. The GitHub
-release exists, but the npm registry's gtfs-mcp/1.0.2 lookup returned 404; do not
-replace this route with a guessed npx command. Upstream also publishes a Docker
-image, but this package has not qualified its Docker deployment.
+---
 
-## Configure Halifax without asking the rider to edit JSON
+## 2. Native Tool Contracts
 
-Use reference/halifax.gtfs.example.json as the starting point. An authorized
-operator or setup assistant should produce a separate runtime config, choose an
-owned data directory, and set HOPPER_GTFS_CONFIG to that file's server-readable
-path through the installation's normal environment controls. Never write private
-locations into the example or public source repository. The config identifies
-public transit systems; the rider's usual stop is a separate private preference.
+The plugin exposes six native tools under `profile: minimal`:
 
-The example declares schedules, trip updates, and vehicle positions, but no
-alerts feed. Missing alerts are not an all-clear. Confirm America/Halifax as the
-agency timezone; the rider's device timezone may differ.
+1. **`search_transit_systems({ query, limit? })`**:
+   Searches the public MobilityData catalog for agencies matching the query.
+   Returns candidate IDs, locations, feed URLs, and authentication requirements.
+2. **`use_transit_system({ system_id })`**:
+   Validates feeds and saves the selected agency for this agent across sessions.
+   *Must only be invoked after explicit user confirmation.*
+3. **`get_transit_system({})`**:
+   Returns the currently configured system metadata, or `null` if unconfigured.
+   Halifax is included as a public preset (`mdb-734`).
+4. **`search_transit_stops({ query, limit? })`**:
+   Searches for stops by name or exact public stop ID.
+5. **`get_transit_departures({ stop_id, route_id?, limit? })`**:
+   Queries live vehicle and trip updates. Returns predicted departures with ISO
+   timestamps, `headsign`, stop sequence, feed age, and agency timezone.
+6. **`get_transit_vehicles({ route_id?, limit? })`**:
+   Queries current public vehicle locations, headings, and speeds.
 
-## Register once through Template Add
+### Tool Grants
+Hopper declares bounded allowances in `CLAW.md`:
+```yaml
+tools:
+  profile: minimal
+  alsoAllow:
+    - read
+    - write
+    - edit
+    - search_transit_systems
+    - use_transit_system
+    - get_transit_system
+    - search_transit_stops
+    - get_transit_departures
+    - get_transit_vehicles
+  fs:
+    workspaceOnly: true
+```
+Unrestricted tool profiles, shell execution, or wildcard plugin allowances are
+never required or granted.
 
-Provision the executable and runtime config first; let Template Add register the
-manifest's hopper-transit MCP declaration. Do not create a same-named server with
-a different definition before Add. OpenClaw correctly refuses that collision
-rather than overwriting shared configuration. In particular, a literal config
-path and the manifest's environment-reference form are different declarations.
-For an existing server, inspect and reconcile through ordinary operator controls
-with the user's authority; do not delete or replace it automatically.
+---
 
-## Verify the connection
+## 3. Onboarding & Diagnostic States
 
-Use OpenClaw's ordinary MCP settings/probe path, keeping existing approvals.
-Do not stop a live Gateway or edit shared configuration from rider onboarding.
-Offline CLI probes require that their selected Gateway state is not live; use
-the supported Control UI path for a running installation.
+1. **Ready with Usable Coverage**:
+   - `get_transit_system` returns active system (e.g. `mdb-734`).
+   - Stop and departure queries succeed.
+2. **Tools Responding, City Unconfigured**:
+   - `search_transit_systems` finds candidate systems.
+   - If a feed requires API authentication or lacks realtime updates, Hopper explains
+     this limitation honestly without guessing.
+3. **Explicit Permission Denial**:
+   - Symptom: Tool call explicitly returns policy/permission denial.
+   - Action: Operator verifies Gateway tool profile and grants Hopper access to the
+     concrete tools listed above.
+4. **Connection or Runtime Failure**:
+   - Symptom: Tool call fails with transport drop or worker crash.
+   - Action: Operator inspects Gateway and plugin logs.
+5. **No Visible Compatible Tools**:
+   - Symptom: Session has no transit tools exposed.
+   - Action: Operator verifies plugin installation and Gateway consent. Hopper
+     operates in schedule-interpretation fallback mode.
 
-Verify list_systems, search_stops, get_stop, get_feed_health, and get_arrivals.
-The live stdio test found 11 tools, public Halifax stops, fresh trip updates and
-five realtime arrivals at stop 8336. OpenClaw's native MCP probe also connected through the declared gtfs-mcp command
-and discovered all 11 tools without diagnostics. These prove the runtime/feed
-and native discovery paths, not a completed model conversation or Template Add.
+---
 
-## Other cities
+## 4. Boundaries & Scope
 
-Configure verified official GTFS feeds and their agency timezone through the
-same runtime. The rider selects among configured systems. General GTFS support
-does not guarantee a city's coverage, realtime data, or transfer routing. This
-version has no worldwide agency directory or custom geolocation/city-picker UI.
+- **No alert queries**: Disruption alerts are not queried in this version.
+- **No journey planning**: Direct boarding-stop departures only.
+- **No background watches**: On-demand queries only; no automations or recurring jobs.
+- **No scheduled timetable fallback**: If static schedule data is absent, Hopper
+  does not manufacture a timetable time.

@@ -41,6 +41,44 @@ not current travel advice.
 8. Source hosting and review: GitHub repository created at
    https://github.com/DonnieFi/agent-templates with draft PR #1
    (https://github.com/DonnieFi/agent-templates/pull/1) opened against main.
+9. Manifest and capability-discovery reconciliation:
+   - Removed unconditional `mcpServers.hopper-transit` declaration from `CLAW.md`
+     to avoid creating dead/duplicate server definitions before capability discovery.
+     External MCP runtime recipe preserved in `reference/transit-setup.md`.
+   - Removed optional `automations: []` line from `CLAW.md` following ClawHub
+     CLI 0.25.1 workaround; verified zero automations are declared.
+   - Reconciled tool grants in `CLAW.md` to concrete transit tool names without
+     wildcards or shell access.
+   - Updated `BOOTSTRAP.md`, `skills/transit/SKILL.md`, and operating rules to
+     check exposed capabilities before commute setup, reuse facts already supplied,
+     and distinguish evidence-based diagnostic states (ready, unconfigured city,
+     explicit permission denial, connection failure, no visible tools).
+   - Strict departure provenance: distinguish live predictions, scheduled timetable
+     times, stale predictions (with age), and unavailable data; never relabel stale
+     predictions as scheduled.
+   - Corrected operator verification of `gtfs-mcp` v1.0.2 to check source commit
+     and `package.json` version plus MCP protocol handshake (removing unsupported
+     `--version` CLI flag recommendation).
+   - Documented planned Hopper transit plugin status neutrally without fictional URLs,
+     and defined future plugin architecture boundaries and acceptance gate criteria.
+10. Bundled native GTFS plugin integration:
+   - Authoritative source repository: https://github.com/DonnieFi/openclaw-gtfs
+     (Draft PR #1: https://github.com/DonnieFi/openclaw-gtfs/pull/1, commit ba65c1db45d63dd94743e4371bb37bad57f87093).
+   - Packaged artifact SHA-256: c51cbc87d5f94e382940be0044b412da539a6abb9323943174f6507c58e98c7d (hopper-gtfs-plugin-0.1.0-dev.3.tgz).
+   - Staged exact built distribution under templates/hopper/plugins/gtfs/ (compiled JS in dist/,
+     package.json, openclaw.plugin.json, README.md, LICENSE; no node_modules, no editable TypeScript).
+   - Declared bundled dependency in CLAW.md (plugins: [{ path: "plugins/gtfs" }]).
+   - Reconciled tool grants to six native tools: search_transit_systems, use_transit_system,
+     get_transit_system, search_transit_stops, get_transit_departures, get_transit_vehicles.
+   - Native departure schema alignment: returned field is `headsign` (not `trip_headsign`);
+     feed freshness rejects feeds >120s; empty departures on fresh queries represent no
+     upcoming departures within the window.
+   - Zero automations; removed obsolete mcpServers and HOPPER_GTFS_CONFIG requirements.
+11. Disposable Gateway Template Add verification:
+   - Configured disposable profile `hopper-test-disp` with `gateway.controlUi.experimental.templates = true`.
+   - Verified no pre-existing plugin or environment variables.
+   - `templates add --dry-run` resolved 14 actions, 2 bundled packages (`skills/transit`, `plugins/gtfs`), and the 3 declared capability escalations with 0 MCP servers and 0 automations.
+   - `templates add --accept-capabilities` successfully scaffolded the workspace at `~/.openclaw-hopper-test-disp/workspace-hopper` and registered `agent:hopper`. The opening turn stopped cleanly when no route-compatible OpenAI credentials were configured in the isolated test profile, retaining the agent and its staged files without duplication or corruption.
 
 ## Findings applied to instructions
 
