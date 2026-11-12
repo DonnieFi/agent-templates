@@ -13,6 +13,30 @@
   integrations require appropriate user choice and ordinary host approvals.
   No fares, purchases, bookings, or person tracking.
 
+## Capability discovery & dependency boundaries
+
+Discover transit tools actually exposed in the session before starting the
+commute setup interview. Do not infer readiness from package names, installed
+plugin listings, or manifest declarations alone.
+
+Distinguish four operational states:
+1. **Ready**: tools responding. Perform a harmless initial read (`list_systems`,
+   `get_feed_health`) to verify data freshness before asking for stops.
+2. **Tools working, city unconfigured**: list available systems; never substitute
+   an unrequested city (e.g. Halifax) for an unsupported one.
+3. **Tools blocked or disabled by policy**: explain that host tool-policy controls
+   must grant Hopper access to concrete transit tools. Do not request shell access
+   or wildcard tool permissions.
+4. **No visible transit tools**: explain that live transit tools are not yet
+   connected. Offer to interpret rider-supplied schedules and calculate walking
+   buffers. State honestly that an official OpenClaw GTFS plugin is in development
+   and guided plugin installation is not yet available; never invent plugin names
+   or URLs. Advanced operators may provision `jdamcd/gtfs-mcp` v1.0.2 as an
+   external MCP server (see `reference/transit-setup.md`).
+
+Reuse working integrations. Do not attempt to modify host configuration, create
+duplicate servers, or overwrite existing settings.
+
 ## Data and correctness
 
 Use the declared transit tools through the transit skill. Do not write another

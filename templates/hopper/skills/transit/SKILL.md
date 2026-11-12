@@ -1,72 +1,101 @@
 ---
 name: hopper-transit
-description: Find stops, check live or scheduled departures, and compare catchable direct transit options using Hopper's configured GTFS MCP tools.
+description: Discover transit capabilities, find stops, check live or scheduled departures, and compare catchable direct transit options using configured GTFS tools.
 ---
 
 # Transit with Hopper
 
 Use for stop lookup, route/direction questions, departures, disruptions, and
-public vehicle positions. This skill uses existing data tools; it does not
-implement a GTFS engine or start background watches.
+public vehicle positions. This skill uses existing transit data tools; it does not
+implement an internal GTFS parser, alter host configurations, or run background
+watches.
 
-## Resolve before recommending
+## 1. Capability Discovery & Verification
 
-1. Discover the declared hopper-transit MCP tools. Transport prefixes vary; use
-   actual exposed schemas, not guessed callable names. If none are visible, say
-   that you cannot access the tools in this session; do not assume the server is
-   missing. An operator can distinguish connection/provisioning failures from
-   tool-profile or permission filtering using the ordinary MCP probe and policy
-   controls. Respect denials; do not request broad permissions or bypass them.
-   See reference/transit-setup.md in the workspace for the relevant prerequisite.
-2. Call list_systems and use the real system ID. Match the rider's city only to
-   configured systems. Ask a short question when ambiguous.
-3. Use find_nearby_stops with a voluntarily shared coordinate, or search_stops
-   for a name. Check get_stop and list_routes/get_route as needed for direction
-   and ordered stops. Opposite-side stops are not interchangeable.
-4. Verify the requested destination comes after the boarding stop on the actual
-   service using get_route/get_trip as appropriate. These tools are not a general
-   multi-transfer journey planner. Disclose that limitation when relevant.
+1. **Discover available tools**:
+   Inspect the tools exposed in the current session. Compatible transit integrations
+   may expose tools under the `hopper-transit__` namespace or un-prefixed names:
+   - `list_systems`
+   - `search_stops`
+   - `find_nearby_stops`
+   - `get_stop`
+   - `get_arrivals`
+   - `list_routes`
+   - `get_route`
+   - `get_alerts`
+   - `get_vehicles`
+   - `get_trip`
+   - `get_feed_health`
+   Match tools by their function schemas and parameters rather than assuming a
+   rigid transport prefix.
+2. **Permission & Accessibility Boundaries**:
+   If tools are not visible or return permission errors, do not assume software is
+   missing. It may be disabled, disconnected, or restricted by host tool policy.
+   Explain the boundary clearly without requesting shell commands or wildcard
+   permissions. If an integration uses custom names, note that operator grants
+   are required.
+3. **Harmless Initial Read**:
+   When tools are visible, call `list_systems` to verify connectivity and retrieve
+   configured agency system IDs. Check `get_feed_health` when supported to assess
+   data freshness before making departure claims.
 
-## Get departures
+## 2. Resolving Stops & Directions
 
-Check get_feed_health, get_arrivals for the confirmed stop, and relevant
-get_alerts. Independent reads can run together after resolving IDs. An empty
-alerts response from an unconfigured feed does not establish an all-clear.
+1. **Match Configured System**:
+   Compare the rider's requested city only against confirmed system IDs. If
+   ambiguous, ask a short clarifying question. Never substitute an unrequested
+   city or assume global coverage.
+2. **Find Stops**:
+   Use `find_nearby_stops` when the rider shares a coordinate, or `search_stops`
+   for a stop name or intersection. Inspect `get_stop` and `list_routes`/`get_route`
+   to verify travel direction and stop sequences. Opposite-side stops are not
+   interchangeable.
+3. **Validate Direct Travel**:
+   Confirm that the requested destination comes after the boarding stop on the
+   actual trip using `get_route` or `get_trip`. These tools support direct routes,
+   not complex multi-transfer journey planning; disclose that limit when relevant.
 
-Inspect prediction/source fields, timestamps, and errors. Missing realtime
-coverage means scheduled advice, clearly labeled. Stale or unknown freshness
-must not become a fresh live prediction in the answer.
+## 3. Retrieving & Interpreting Departures
 
-Use returned public route names and local times. In gtfs-mcp 1.0.2, an arrival
-headsign can be the last stop named in a realtime update rather than the actual
-vehicle sign; use get_trip.trip.trip_headsign and the ordered stop list to verify
-the direction for a recommendation. Do not label a terminal-stop inference as a
-confirmed vehicle sign. Resolve unclear direction before recommending. With
-walking time and a confirmed buffer,
-compare valid departures to the earliest comfortable boarding time. This runtime
-returns local clock strings and rounded minutes_away, not full absolute arrival
-timestamps. Treat its relative minutes as approximate, account for elapsed time
-since the query, and do not make second-precise or boundary-tight promises. For a
-margin inside the rounding uncertainty, offer the later option. Do not invent a
-service date from a clock string. Without a walking estimate, show departures
-without “leave now.”
+1. **Query Arrivals & Feed Health**:
+   Query `get_arrivals` for the confirmed stop and check relevant `get_alerts`.
+   Inspect timestamps, prediction indicators, and error fields.
+   - Realtime predictions must be explicitly labeled as live.
+   - When realtime updates are missing, stale, or unavailable, clearly label the
+     time as scheduled.
+   - An empty alerts response from an unconfigured alert feed does not mean there
+     are no disruptions.
+2. **Headsign & Direction Verification**:
+   In `gtfs-mcp` v1.0.2, arrival headsigns in realtime updates may name intermediate
+   or terminal stops. Verify the vehicle's true direction using `get_trip.trip.trip_headsign`
+   and the ordered stop list before recommending a boarding direction.
+3. **Walking Time & Catchability**:
+   With the rider's walking estimate and buffer:
+   - Compare departures against the earliest comfortable arrival time.
+   - Account for rounded relative minutes and query age; do not promise
+     second-precise or tight arrival guarantees.
+   - If departure timing falls within rounding uncertainty, recommend the later,
+     safer option.
+   - Without walking estimates, list departures without a "leave now" instruction.
 
-Before saying no service exists, check direction, date, and available alerts.
-Never invent a bus or substitute another city.
+## 4. Presenting Results
 
-## Present
+- Lead with route short name, destination/headsign, boarding stop, and agency-local
+  time.
+- Clearly label data status: **Live prediction** (with freshness if available) vs.
+  **Scheduled timetable**.
+- Include walking/buffer assumptions if provided, plus one sensible backup option.
+- Vehicle positions (`get_vehicles`) show where vehicles currently are; they are
+  not arrival time predictions.
 
-Lead with route/headsign, stop, and agency-local departure time. Label live
-prediction versus schedule versus uncertainty. Include freshness where supported,
-walking/buffer assumptions if used, relevant disruptions, and one useful backup.
-Avoid dumping every vehicle or raw tool output.
+## 5. Graceful Fallback & Setup Guidance
 
-For public vehicle questions use get_vehicles, but positions are not arrival
-predictions. Maps links may use returned public stop/vehicle coordinates; do not
-send private rider coordinates to map services without agreement.
-
-## Watches
-
-This version is on demand. Do not answer a watch request with “tracking started.”
-Explain that no background watcher is installed, provide the current result, and
-offer a further check on request.
+When no compatible transit tools are exposed or the feed is unavailable:
+1. Explain what is missing (no live tool access or unconfigured city feed).
+2. Offer to interpret official timetable tables, schedule text, or stop listings
+   provided by the rider (clearly marked as scheduled/user-supplied, never live).
+3. If an OpenClaw GTFS plugin is in development or unpublished, state honestly
+   that guided plugin installation is not yet available. Never link to unverified
+   or imagined plugin packages.
+4. For advanced operators, reference the external `gtfs-mcp` recipe in
+   `reference/transit-setup.md`.

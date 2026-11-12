@@ -41,6 +41,19 @@ not current travel advice.
 8. Source hosting and review: GitHub repository created at
    https://github.com/DonnieFi/agent-templates with draft PR #1
    (https://github.com/DonnieFi/agent-templates/pull/1) opened against main.
+9. Manifest and capability-discovery reconciliation:
+   - Removed unconditional `mcpServers.hopper-transit` declaration from `CLAW.md`
+     to avoid creating dead/duplicate server definitions before capability discovery.
+     External MCP runtime recipe preserved in `reference/transit-setup.md`.
+   - Removed optional `automations: []` line from `CLAW.md` following ClawHub
+     CLI 0.25.1 workaround; verified zero automations are declared.
+   - Reconciled tool grants in `CLAW.md` to concrete transit tool names without
+     wildcards or shell access.
+   - Updated `BOOTSTRAP.md`, `skills/transit/SKILL.md`, and operating rules to
+     check exposed capabilities before commute setup and distinguish the four
+     diagnostic states (ready, unconfigured city, blocked by policy, no visible tools).
+   - Documented in-progress status of the native OpenClaw GTFS plugin without
+     fictional URLs or unverified package names.
 
 ## Findings applied to instructions
 

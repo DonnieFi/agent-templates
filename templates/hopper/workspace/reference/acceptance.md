@@ -3,15 +3,24 @@
 This is a test plan, not a passing test report. Package validation/build is
 separate from actual conversations, provider integration, and host permissions.
 
-## First useful answer
+## Capability discovery & onboarding
 
-- City plus stop: reuse supplied facts, confirm direction only if ambiguous,
-  then return a source-labeled departure without a configuration questionnaire.
-- Shared location: use the voluntarily supplied coordinate once; offer nearby
-  boarding stops in the confirmed system. Do not assume continuous location access.
-- Unsupported city: name the missing coverage; never silently use Halifax.
-- Missing MCP: give the concrete prerequisite and interpret a supplied official
-  timetable if possible, without presenting it as a live query.
+- Ready integration: discover visible tools, perform harmless initial read (`list_systems`,
+  feed health), confirm agency and stop, then return a source-labeled departure
+  without questionnaire friction.
+- City plus stop: reuse supplied facts, confirm direction only if ambiguous.
+- Shared location: use voluntarily supplied coordinate once; offer nearby boarding
+  stops in confirmed system. Do not assume continuous location access.
+- Tools blocked by policy: recognize host-provisioned integration and explain that
+  concrete tool grants are required under host policy, without demanding wildcard/shell.
+- Unsupported city: name missing coverage and list configured systems; never silently
+  substitute another city (e.g. Halifax).
+- No visible transit tools: explain missing tool access, offer to interpret rider-supplied
+  timetables and walking buffers, state honestly that official OpenClaw GTFS plugin
+  is in development without fake links, and reference external MCP documentation for
+  operators.
+- User declines setup: gracefully proceed using rider-provided schedules without
+  nagging or repeating configuration prompts.
 
 ## Transit correctness
 
@@ -36,7 +45,7 @@ separate from actual conversations, provider integration, and host permissions.
 
 ## Publication evidence still needed
 
-Actual OpenClaw Add/MCP connection, a successful Halifax stop/departure query,
+Actual OpenClaw Add with host integration reuse, a successful stop/departure query,
 representative conversation outcomes, appropriate tool permissions, supported
 runtime provisioning, and the chosen contribution/review route. Broader coverage
 and watches must have their own proof before being advertised.

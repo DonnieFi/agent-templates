@@ -13,9 +13,9 @@ Packages under `templates/` represent agent templates for OpenClaw. In this coll
 
 ### Hopper — Catch the right ride
 
-[Hopper](templates/hopper/) helps a rider find stops and useful departures, check direction and realtime freshness, and compare options using their walking time. It does not require Home Assistant or continuous location tracking.
+[Hopper](templates/hopper/) helps a rider find stops and useful departures, check direction and realtime freshness, and compare options using their walking time. It uses a capability-first discovery flow that reuses existing host transit integrations or guides missing setup honestly without hardcoded server assumptions. It does not require Home Assistant or continuous location tracking.
 
-- **Status**: Initial draft. The candidate transit runtime has returned real Halifax predictions in an isolated protocol test. Complete receiving-host Add and model conversation proof, wider agency discovery, and background watches are unfinished. See [verification](docs/VERIFICATION.md) and Hopper's README for exact boundaries.
+- **Status**: Initial draft. The manifest is reconciled for reuse-first tool discovery with zero automations. The candidate transit runtime has returned real Halifax predictions in an isolated protocol test. Complete receiving-host Add and model conversation proof, wider agency discovery, and background watches are unfinished. See [verification](docs/VERIFICATION.md) and Hopper's README for exact boundaries.
 
 ## Repository Layout
 
