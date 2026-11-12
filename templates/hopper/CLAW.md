@@ -26,6 +26,17 @@ agent:
       - hopper-transit__get_vehicles
       - hopper-transit__get_trip
       - hopper-transit__get_feed_health
+      - list_systems
+      - search_stops
+      - find_nearby_stops
+      - get_stop
+      - get_arrivals
+      - list_routes
+      - get_route
+      - get_alerts
+      - get_vehicles
+      - get_trip
+      - get_feed_health
     fs:
       workspaceOnly: true
 workspace:
@@ -50,26 +61,6 @@ workspace:
 skills:
   - path: skills/transit
 plugins: []
-mcpServers:
-  hopper-transit:
-    command: gtfs-mcp
-    transport: stdio
-    env:
-      GTFS_MCP_CONFIG: "${HOPPER_GTFS_CONFIG}"
-    toolFilter:
-      include:
-        - list_systems
-        - search_stops
-        - find_nearby_stops
-        - get_stop
-        - get_arrivals
-        - list_routes
-        - get_route
-        - get_alerts
-        - get_vehicles
-        - get_trip
-        - get_feed_health
-automations: []
 ---
 
 # Hopper

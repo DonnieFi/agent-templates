@@ -5,65 +5,76 @@ setup and stop/direction-aware departures. Preferences can be reused in the
 conversation; cross-conversation saving requires a verified private store.
 No Home Assistant or continuous location tracking required.
 
-## Initial draft
+## What Hopper includes vs. external integration
 
-This package contains onboarding, operating instructions, a bundled workflow
-skill, a declared external MCP dependency, and a Halifax configuration example.
-It is not yet a production-ready transit service. The external runtime requires
-provisioning. Real Halifax MCP queries and native OpenClaw tool discovery passed;
-full Template Add and a model conversation remain unverified. Global agency
-discovery, custom picker UI, and background watches are not implemented.
+- **Included in this template**:
+  - Conversational persona, onboarding flow, and operating rules.
+  - Bundled transit workflow skill (`skills/transit`).
+  - Reference departure presentation layouts, setup guides, and fictional examples.
+- **Supplied by a transit integration**:
+  - Live and scheduled GTFS query capabilities (`list_systems`, `search_stops`, `get_arrivals`, etc.).
+  - Transit feed connections, updates, and caching.
 
-## Focus-week package
+Hopper is capability-detection-first: it discovers tools actually exposed in the
+session rather than assuming hardcoded server declarations or fixed transport
+prefixes.
 
-This is an OpenClaw Template contribution, not a new transit application or a
-change to OpenClaw core. Its structure was compared with published Competitor
-Watch, Travel Copilot, and Everyday Meal Planner packages. See the mapped
-reference/sources.md for exact versions and provenance. Fictional voice examples,
-an answer guide, and acceptance scenarios accompany the workflow; the scenarios
-are not claimed as passed conversation tests.
+## Capability checking & missing dependencies
+
+On first run, Hopper checks for exposed transit tools before beginning commute setup:
+1. **Ready**: If compatible tools are exposed, Hopper performs a harmless read
+   (`list_systems`, feed health) to verify data freshness before asking for stops.
+2. **Tools working, city unconfigured**: Lists configured systems; does not guess
+   or substitute another agency.
+3. **Tools blocked by policy**: Informs the user that transit tools are provisioned
+   on the host Gateway but require explicit tool grants in host policy.
+4. **No visible tools**: Explains that live transit tools are not yet connected.
+   Hopper can still calculate walking time buffers, assess catchability, and
+   interpret transit schedules or timetable text provided by the rider.
+   - An official OpenClaw GTFS plugin is in development (guided installation is
+     not yet published on ClawHub).
+   - Advanced operators can provision an external GTFS MCP server using the qualified
+     `jdamcd/gtfs-mcp` v1.0.2 source-build recipe detailed in `reference/transit-setup.md`.
+   - If the rider declines setup, Hopper continues in schedule-interpretation mode
+     without nagging.
 
 ## Before Add
 
-This is an operator-provisioned pilot, not a one-click installation. The receiving
-Gateway needs the reviewed gtfs-mcp executable and HOPPER_GTFS_CONFIG binding
-before live rider onboarding can work. The template itself does not install them.
-No persistent commute store is bundled or verified in this version.
+Hopper does not bundle an internal GTFS engine or hardcode an unconditional
+MCP server in its manifest. This avoids broken installations or duplicate servers.
+If connecting an external runtime, review `workspace/reference/transit-setup.md`
+for operator provisioning steps.
 
 ## First ride
 
-1. Review CLAW.md and workspace/reference/transit-setup.md.
-2. Have an operator provision the external executable and runtime config. The
-   qualified candidate is jdamcd/gtfs-mcp v1.0.2. Do not separately register a
-   different server named hopper-transit; Template Add owns that declaration.
-3. Inspect and Add the Template with normal OpenClaw review and consent.
-4. Tell Hopper a city/stop or voluntarily share one location where supported.
-5. Confirm agency and direction; get a real departure answer before optional
-   personalization. Save preferences only in an available private store.
+1. Inspect and Add the Template with normal OpenClaw review and consent.
+2. Start a conversation with Hopper. Hopper checks available transit tools.
+3. Tell Hopper your starting location or stop and destination.
+4. Confirm agency and direction; receive a departure answer labeled with live
+   prediction or scheduled timetable status before optional personalization.
+5. Save preferences only when a verified private store is available.
 
 Ask “What are my next departures?”, “It takes me eight minutes to walk there;
 allow three minutes extra,” or “Remember this stop as my commute.” Hopper must
 label live predictions versus schedules and explain unavailable coverage.
 
-The Halifax preset has schedules, trip updates, and vehicle positions; it has
-no configured alerts feed. Other cities need verified configured feeds. There
-are no default automations, fares/purchases, person tracking, or arrival-safety
+There are no default automations, fares/purchases, person tracking, or arrival-safety
 claims. On-demand questions do not start background activity.
 
 ## Files
 
-- CLAW.md: manifest and personality, becoming the new agent's SOUL.md.
-- BOOTSTRAP.md: first-run conversation.
-- workspace/AGENTS.md: correctness, privacy, and authority.
-- skills/transit/SKILL.md: workflow for existing transit tools.
-- workspace/reference/: operator setup and Halifax configuration example.
-- package.json: package metadata, without scripts or lifecycle hooks.
+- `CLAW.md`: Manifest frontmatter and personality (`SOUL.md`).
+- `BOOTSTRAP.md`: Capability-first first-run conversation guide.
+- `workspace/AGENTS.md`: Correctness, privacy, capability states, and authority.
+- `skills/transit/SKILL.md`: Workflow skill for discovering and querying transit tools.
+- `workspace/reference/`: Operator setup, acceptance scenarios, and Halifax configuration example.
+- `package.json`: Package metadata.
 
 ## Validate
 
 Use OpenClaw's templates validate, dev, and build commands. Package validation
-does not install the external server or prove a live agent query. The README is
-also mapped into reference/package-readme.md for the installed agent.
+does not install external servers or prove live model queries. The README is
+also mapped into `reference/package-readme.md` for the installed agent.
 
 ## Inspiration and building blocks
 
