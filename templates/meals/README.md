@@ -82,7 +82,7 @@ or establish provider coverage. The README is also mapped into
 
 The plugin source is the sibling `openclaw-meals` repository. The template vendors
 only the tested build: `openclaw-meals-plugin@0.1.0`, artifact SHA-256
-`97fdcdca851a685dc70220476ca85db0acb5298531f154ef45a081ba025731f6`.
+`7a6c27a84afdc1d418c1197c48e3a907d7654832d42c202225ca923de28f4fa6`.
 
 No private household records, real postal codes, store lists, raw conversations,
 or machine-specific paths are included.

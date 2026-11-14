@@ -310,7 +310,7 @@ class TutorService {
     };
   }
   async listAssessments(input, scope) {
-    const days = input.days ?? 21;
+    const days = input.days ?? 30;
     if (!Number.isInteger(days) || days < 1 || days > 90) throw new Error("days must be between 1 and 90.");
     const calendarItems = cleanCalendar(input.calendarItems);
     const state = await this.load(scope);

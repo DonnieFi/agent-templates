@@ -9,7 +9,7 @@ job.
 - Package: `openclaw-meals-plugin@0.1.0`
 - Plugin ID: `meals`
 - Artifact: `openclaw-meals-plugin-0.1.0.tgz`
-- SHA-256: `97fdcdca851a685dc70220476ca85db0acb5298531f154ef45a081ba025731f6`
+- SHA-256: `7a6c27a84afdc1d418c1197c48e3a907d7654832d42c202225ca923de28f4fa6`
 - Source: the sibling `openclaw-meals` plugin repository
 - Staged path: `plugins/meals/` with compiled `dist/`, `package.json`,
   `openclaw.plugin.json`, `README.md`, and `LICENSE`
@@ -60,7 +60,8 @@ There is no default postal code and no default store list. Setup can skip either
 Without a postal code, meals, the grocery list, and week suggestions still work.
 
 The full postal code is not returned by either setup tool and is not written to
-a workspace file. The plugin uses it only to construct the flyer request.
+a workspace file. The plugin uses it only to construct the flyer request; the
+public flyer provider receives it as part of that request.
 
 ## Flyer behavior
 

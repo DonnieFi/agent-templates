@@ -54,7 +54,8 @@ npm artifact through OpenClaw so the host manages `typebox`.
 ## Privacy
 
 A saved postal code is used only to construct the flyer search request. Tool
-output masks it and errors do not include the request URL. The plugin does not
+output masks it and errors do not include the request URL. The public flyer
+provider receives the postal code as part of that request. The plugin does not
 write workspace files, log the postal code, or share state between agents.
 
 ## Template hookup

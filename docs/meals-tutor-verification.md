@@ -46,7 +46,7 @@ Observed: 11 tests passed, 0 failed. Cover:
 
 Plugin package: `openclaw-meals-plugin@0.1.0`.
 Artifact SHA-256:
-`97fdcdca851a685dc70220476ca85db0acb5298531f154ef45a081ba025731f6`.
+`7a6c27a84afdc1d418c1197c48e3a907d7654832d42c202225ca923de28f4fa6`.
 
 ### Tutor
 
@@ -69,7 +69,7 @@ Observed: 9 tests passed, 0 failed. Cover:
 
 Plugin package: `openclaw-tutor-plugin@0.1.0`.
 Artifact SHA-256:
-`bc1535ec9c7b34be235cc4a17047ef6daa635aa8d633366378bb39b33f0af664`.
+`e907e41311f2e72a0fdbce3da79d029b0d6bc8fa861f823443b1efd77001daa2`.
 
 ## Template checks
 
@@ -101,9 +101,9 @@ Observed:
 Template artifact integrity:
 
 - `dist/meals-0.1.0.tgz`:
-  `sha256:545eea48091727abc2c708c1acef20e41d4a7719aedefea8c8675590971ea855`
+  `sha256:e86c75be7becadf659bcaf33b5b100da0a3a9e490c4af79ea5d15fbbcdf05d5e`
 - `dist/tutor-0.1.0.tgz`:
-  `sha256:4b290cfa61f8149e81eaf5fef1ca68ff71b390521850dc0121761b56bda9b1a6`
+  `sha256:157b42d0db5b79df4a5ac83bcfa3f97b339af0c4de9cd49ce9590eaaa08e0966`
 
 ## Boundaries confirmed in the packages
 

@@ -97,7 +97,7 @@ or establish calendar coverage. The README is also mapped into
 
 The plugin source is the sibling `openclaw-tutor` repository. The template vendors
 only the tested build: `openclaw-tutor-plugin@0.1.0`, artifact SHA-256
-`bc1535ec9c7b34be235cc4a17047ef6daa635aa8d633366378bb39b33f0af664`.
+`e907e41311f2e72a0fdbce3da79d029b0d6bc8fa861f823443b1efd77001daa2`.
 
 No private student records, real syllabi, raw conversations, or machine-specific
 paths are included.
