@@ -155,3 +155,11 @@ Observed 2026-11-14 with OpenClaw 2026.11.3 (17db247).
 - Base conversation, supplied-context planning, and consent-based local profiles require no Family Pack or startup service probes. Optional owner-approved Family Pack onboarding can reuse an existing family agent or offer a template; it must preserve identity/notes and tolerate skipped or removed integrations.
 - Validate, offline preview, inspect, build, and diff checks passed again; five preview actions, one capability escalation, zero blockers. Archive SHA-256: `16a72c3c09b06ab468767fc5fbc59e3093a4db4a0ef7a0ff1f8ece44f46b5bdc` supersedes earlier hashes.
 - Standalone/model and Family Pack handoff acceptance scenarios remain unexecuted. No Family Pack startup code was inspected or changed in this repository.
+
+## Meals and Tutor v1 — 2026-11-14
+
+- Added two independently buildable packages with sibling plugin sources, pinned builds, skills, setup notes, fictional examples, and acceptance plans.
+- Plugin tests passed: Meals 11/11, Tutor 10/10, using fake keyed stores, clocks, and fictional flyer and calendar fixtures. No network or host state was touched.
+- `openclaw templates validate`, offline `dev`, `inspect`, and `build` passed for both packages. Each reports one agent, one skill, one bundled plugin, zero MCP servers, zero automations, and zero blocked preview actions.
+- Meals archive SHA-256: `180b908f711f5e96d8f10cf34b360c58bd9f67d3b83ded716bee58de3e92c196`. Tutor archive SHA-256: `54083b17dbc2d2dc888d72c66a62034afebd9dad6e5213b5a24d195bab776bb1`.
+- No live flyer request, live calendar call, Template Add, model conversation, Family Pack install, or publication is part of this proof. See [meals-tutor-verification.md](meals-tutor-verification.md) for the detailed boundary list.
