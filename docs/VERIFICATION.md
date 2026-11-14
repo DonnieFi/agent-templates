@@ -1,5 +1,8 @@
 # Hopper verification
 
+Meals and Tutor proof is recorded separately in
+[meals-tutor-verification.md](meals-tutor-verification.md).
+
 Observed 2026-11-11. This is an initial draft, not publication or a production
 readiness declaration. Public feed observations below are historical evidence,
 not current travel advice.

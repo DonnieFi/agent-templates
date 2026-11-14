@@ -45,7 +45,7 @@ tool profile, with `fs.workspaceOnly: true`.
 `get_meals_setup` reports:
 
 - whether a postal code is present,
-- a masked hint such as `K1A***`,
+- a masked hint such as `X0X***`,
 - the configured stores and whether the list is set,
 - whether flyer search is available.
 

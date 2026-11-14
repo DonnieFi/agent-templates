@@ -30,7 +30,7 @@ stores should I watch? You can skip either part.”
 - No default postal code and no default store list.
 - Save their answer with `save_meals_setup` only after they give it.
 - Never read the postal code back in full. `get_meals_setup` returns a hint such
-  as `K1A***`.
+  as `X0X***`.
 - If they skip, continue. Meals, the grocery list, and week suggestions still
   work.
 
