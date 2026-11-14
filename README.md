@@ -2,13 +2,14 @@
 
 Portable OpenClaw agents built around useful everyday jobs.
 
-Packages under `templates/` represent agent templates for OpenClaw. In this collection, [Hopper](templates/hopper/) is the current-format, independently versioned OpenClaw Template package; [starter-agent](templates/starter-agent/) is a legacy scaffold (retaining `agent.json` and `prompts/system.md` rather than an installable OpenClaw `CLAW.md`/`package.json` manifest). This source repository is separate from ClawHub publication: reviewing or merging source does not publish a registry package or install an agent.
+Packages under `templates/` represent agent templates for OpenClaw. In this collection, [Hopper](templates/hopper/) and [Bernie](templates/bernie/) are current-format, independently versioned OpenClaw Template packages; [starter-agent](templates/starter-agent/) is a legacy scaffold (retaining `agent.json` and `prompts/system.md` rather than an installable OpenClaw `CLAW.md`/`package.json` manifest). This source repository is separate from ClawHub publication: reviewing or merging source does not publish a registry package or install an agent.
 
 ## Available Templates
 
 | Template | Description | Status |
 | :--- | :--- | :--- |
 | [**Hopper**](templates/hopper/) | Catch the right ride: conversational transit companion with stop/direction-aware departures, walking buffers, and live vs. scheduled status | Draft / Pilot |
+| [**Bernie**](templates/bernie/) | Household companion: practical help from what people share, plus consent-based local profiles for family and pets | Draft |
 | [**Starter Agent**](templates/starter-agent/) | Minimal scaffold for building custom autonomous agents | Legacy scaffold—not installable |
 
 ### Hopper — Catch the right ride
@@ -17,9 +18,16 @@ Packages under `templates/` represent agent templates for OpenClaw. In this coll
 
 - **Status**: Initial draft. The manifest is reconciled for reuse-first tool discovery with zero automations. The candidate transit runtime has returned real Halifax predictions in an isolated protocol test. Complete receiving-host Add and model conversation proof, wider agency discovery, and background watches are unfinished. See [verification](docs/VERIFICATION.md) and Hopper's README for exact boundaries.
 
+### Bernie — house griffon
+
+[Bernie](templates/bernie/) is a household companion for practical planning from what people share. With permission, he keeps separate local Markdown profiles for family members and pets. The base package declares workspace read, write, and edit only. It does not bundle Family Pack, Home Assistant, calendars, reminders, credentials, or a Discord connection. An optional guide describes how an operator can route an existing Discord bot later.
+
+- **Status**: Initial draft. Package validation, offline preview, inspection, and archive build are recorded. Model conversation, Template Add, live Discord identity and reply tests, and receiving-host permissions are unfinished. See [verification](docs/VERIFICATION.md) and Bernie's README for exact boundaries.
+
 ## Repository Layout
 
 - `templates/hopper/`: Hopper's complete package source.
+- `templates/bernie/`: Bernie's complete package source.
 - `templates/starter-agent/`: Legacy starter scaffold (not an installable OpenClaw Template package).
 - `templates/<another-agent>/`: Future independent packages.
 - `docs/VERIFICATION.md`: Observed evidence and outstanding checks.
@@ -45,11 +53,12 @@ openclaw templates dev ./templates/hopper
 openclaw templates inspect ./templates/hopper
 ```
 
-Build into an existing local output directory:
+Use `./templates/bernie` in those three commands to check Bernie. Build into an existing local output directory:
 
 ```bash
 mkdir -p dist
 openclaw templates build ./templates/hopper --out ./dist/hopper-0.1.0.tgz
+openclaw templates build ./templates/bernie --out ./dist/bernie-0.1.0.tgz
 ```
 
 These checks do not create an agent or publish a package. Adding, connecting external services, enabling automations, and ClawHub publication are separate reviewed actions. Do not run installation or publishing commands as a test.
