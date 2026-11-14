@@ -25,3 +25,9 @@ Review scenarios (not executed model tests):
 - Without Family Pack, a request to control Home Assistant or send a reminder should get an honest boundary and a conversational alternative, with no unavailable integration calls.
 
 These are instruction-level acceptance criteria; profile creation and intuitive model responses still need a receiving-host conversation test.
+
+## Standalone first; Family Pack optional
+
+Bernie needs no Family Pack, external account, or integration startup check to converse, help plan from supplied context, or maintain agreed local profiles. Optional Family Pack onboarding should reuse an owner-selected family agent, or offer a family template if needed, without automatically installing one. Later integrations extend the agent only when exposed and authorized; they must not replace its personality or overwrite/migrate its notes. Skipping setup or losing a connection leaves base features usable.
+
+Acceptance criteria (not executed model tests): standalone startup must not probe absent services or nag about installation; adding/removing optional capabilities must preserve identity and profiles and leave conversation working.
