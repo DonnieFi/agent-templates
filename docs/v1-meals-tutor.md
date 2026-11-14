@@ -15,6 +15,8 @@ Four new directories, matching `openclaw-gtfs` plus `templates/hopper/`:
 
 The plugin repository is the source of truth. The template vendors a pinned build only after that plugin's tests pass. Neither package lists Family Pack under `requiresPlugins`. A skill calls a Family Pack tool only after it sees that tool.
 
+Plugin ids are `meals-planner` and `tutor-study`. Agent ids stay `meals` and `tutor`. Package names stay `openclaw-meals-plugin` and `openclaw-tutor-plugin` at `0.1.0`.
+
 Tool names are prefixed by package, including setup. Meals and the tutor can both be granted to one agent, such as Bernie, and OpenClaw keeps one tool list per agent.
 
 Each template uses the minimal tool profile plus its own tools in `alsoAllow`. It does not list `family_members` or `family_schedule`. Those stay available when Bernie, or the host policy, grants them.
@@ -37,8 +39,8 @@ The job is a week of dinners, a grocery list, and flyer matches for those items.
 
 - Remember meals for this agent: day, meal, dish, notes.
 - Grocery list: add, remove, and show.
-- Setup asks whether they have a postal code for flyer search, then which stores to watch. Both can be skipped. There is no default postal code and no default store list.
-- Track flyer deals for the current grocery list and for ingredients named on the saved meal plan. `search_flyer_deals` answers one item. A watch check covers the saved list and meal ingredients.
+- Setup asks whether they have a postal code for flyer search, then which stores to watch. Both can be skipped. It also asks once for an IANA timezone, for example `America/Halifax`. Skip, or pass `null`, to use the gateway host's local date. There is no default postal code, store list, or timezone.
+- Track flyer deals for the current grocery list and for ingredients named on the saved meal plan. `search_flyer_deals` answers one item. A watch check covers the saved list and ingredients on meals that are still upcoming in the saved timezone. When the 12-item cap is hit, the rest stay on the grocery list or on later meals.
 - Suggest a week of meals from what is already planned, what is on the list, and any flyer hits. The suggestion is saved. It is not sent anywhere.
 - Meal changes wait for a yes from the person talking.
 
@@ -46,7 +48,7 @@ The job is a week of dinners, a grocery list, and flyer matches for those items.
 
 `get_meals`, `set_meal`, `delete_meal`, `get_grocery_list`, `add_grocery_item`, `remove_grocery_item`, `search_flyer_deals`, `check_flyer_watch`, `get_meals_setup`, `save_meals_setup`, `save_week_suggestion`.
 
-`get_meals` returns the saved plan and any pending week suggestion from `save_week_suggestion`. `get_meals_setup` reports postal code present or absent, and whether stores are set. It does not return the postal code in full in logs or template files.
+`get_meals` returns the saved plan and any pending week suggestion from `save_week_suggestion`. `get_meals_setup` reports postal code present or absent, whether stores are set, and whether a timezone is set. It does not return the postal code in full in logs or template files.
 
 ### Left out
 
@@ -64,15 +66,16 @@ The job is to watch for a test or quiz, prepare a study guide two days ahead, an
 
 - Setup asks whether a calendar is already available. The skill looks for a visible calendar tool, including Family Pack's `family_schedule`. It does not install one.
 - If no calendar tool is visible, setup finishes and the agent reminds them once that the two-day study guide needs a calendar. Topic search and hand-entered test dates still work.
-- When `family_schedule` is the calendar tool, call it with `days: 7` and no `query`. Without `query`, `days` defaults to 1. With `query`, every word must appear in the title, so a keyword such as `test quiz exam` matches nothing. The skill reads the returned sections and looks for test, quiz, and exam locally. The calendar remains the date authority. The tutor does not create calendar events in v1.
+- When `family_schedule` is the calendar tool, call it with `days: 7` and no `query`. Without `query`, `days` defaults to 1. With `query`, every word must appear in the title, so a keyword such as `test quiz exam` matches nothing. The skill reads the returned sections and looks for test, quiz, and exam locally. Pass a display date such as `Fri Oct 9` through. The plugin resolves it. One unrecognized item is reported in `skippedCalendarItems` and does not fail the rest of the call. The calendar remains the date authority. The tutor does not create calendar events in v1.
+- Setup asks once for an IANA timezone. Today and the two-day window use that zone. With none saved, they use the gateway host's local date. There is no default timezone.
 - A study guide is generated on demand. When someone talks to the tutor inside the two-day window, `get_due_study_guides` builds the guide from saved topic notes, stores it, and returns it. Later calls return that same guide until the assessment date passes. v1 has no background scan and no cron.
 - Help search topics against saved notes. Course rules, such as whether to cite an assistant, live in those notes. A new outline is saved only after the person confirms. When `family_members` is visible, the agent asks a parent in chat before saving a shared or school outline. That question is not an approval gate.
 
 ### Tools
 
-`get_tutor_setup`, `save_tutor_setup`, `list_topics`, `save_topic`, `search_topics`, `list_assessments`, `save_assessment`, `get_due_study_guides`.
+`get_tutor_setup`, `save_tutor_setup`, `list_topics`, `save_topic`, `delete_topic`, `search_topics`, `list_assessments`, `save_assessment`, `delete_assessment`, `get_due_study_guides`.
 
-`list_assessments` merges hand-entered dates with calendar items when a calendar tool is visible. `save_assessment` replaces an existing hand-entered date. `get_due_study_guides` is the only study-guide read and write: it generates inside the two-day window and returns the stored guide until the date passes.
+`list_assessments` merges hand-entered dates with calendar items when a calendar tool is visible. `save_assessment` replaces an existing hand-entered date and still requires `YYYY-MM-DD`. `delete_topic` and `delete_assessment` run only after the person confirms. Deleting an assessment also drops its stored guide. `get_due_study_guides` is the only study-guide read and write: it generates inside the two-day window and returns the stored guide until the date passes.
 
 ### Left out
 

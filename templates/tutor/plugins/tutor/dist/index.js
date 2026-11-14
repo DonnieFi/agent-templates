@@ -9,7 +9,11 @@ const dateText = Type.String({
 const calendarItem = Type.Object(
   {
     title: Type.String({ minLength: 1, maxLength: 200 }),
-    date: dateText,
+    date: Type.String({
+      minLength: 1,
+      maxLength: 40,
+      description: "YYYY-MM-DD, or a display date such as Fri Oct 9."
+    }),
     time: Type.Optional(Type.String({ maxLength: 16 })),
     subject: Type.Optional(Type.String({ maxLength: 60 })),
     source: Type.Optional(Type.String({ maxLength: 40 }))
@@ -26,9 +30,12 @@ const definitions = [
   },
   {
     name: "save_tutor_setup",
-    description: "Record the visible calendar tool name after checking the session tools, or pass null when no calendar is visible. Omitting calendarTool keeps the current value. Returns the calendar reminder once when setup finishes without a calendar.",
+    description: "Record the visible calendar tool name after checking the session tools, or pass null when no calendar is visible. timezone is an IANA name used for today and the two-day window; null uses the gateway host clock. Omitting a field keeps its current value. Returns the calendar reminder once when setup finishes without a calendar.",
     parameters: Type.Object(
-      { calendarTool: Type.Optional(Type.Union([Type.String({ maxLength: 64 }), Type.Null()])) },
+      {
+        calendarTool: Type.Optional(Type.Union([Type.String({ maxLength: 64 }), Type.Null()])),
+        timezone: Type.Optional(Type.Union([Type.String({ maxLength: 80 }), Type.Null()]))
+      },
       { additionalProperties: false }
     ),
     run: (service, params, scope) => service.saveSetup(params, scope)
@@ -63,7 +70,7 @@ const definitions = [
   },
   {
     name: "list_assessments",
-    description: "Merge hand-entered assessment dates with calendar items supplied by the skill, filtered to a day range. The calendar remains the date authority. Pass 8:05 AM times as text; convert family_schedule display dates to YYYY-MM-DD before calling.",
+    description: "Merge hand-entered assessment dates with calendar items supplied by the skill, filtered to a day range. The calendar remains the date authority. Display dates such as Fri Oct 9 are accepted. An unrecognized item is skipped and reported. It does not fail the rest of the call.",
     parameters: Type.Object(
       { days: Type.Optional(Type.Integer({ minimum: 1, maximum: 90 })), calendarItems },
       { additionalProperties: false }
@@ -86,6 +93,24 @@ const definitions = [
     run: (service, params, scope) => service.saveAssessment(params, scope)
   },
   {
+    name: "delete_topic",
+    description: "Remove one saved topic by subject and title. Only call after the person talking confirms.",
+    parameters: Type.Object(
+      { subject: Type.String({ minLength: 1, maxLength: 60 }), title: Type.String({ minLength: 1, maxLength: 120 }) },
+      { additionalProperties: false }
+    ),
+    run: (service, params, scope) => service.deleteTopic(params, scope)
+  },
+  {
+    name: "delete_assessment",
+    description: "Remove one hand-entered assessment by subject and title, and drop its stored study guide. Only call after the person talking confirms. Calendar events stay in the calendar.",
+    parameters: Type.Object(
+      { subject: Type.String({ minLength: 1, maxLength: 60 }), title: Type.String({ minLength: 1, maxLength: 120 }) },
+      { additionalProperties: false }
+    ),
+    run: (service, params, scope) => service.deleteAssessment(params, scope)
+  },
+  {
     name: "get_due_study_guides",
     description: "The only study-guide read and write. Within two days of an assessment, build a guide from saved topic notes, store it, and return it. Later calls return the same guide until the assessment date passes. No background scan or cron.",
     parameters: Type.Object({ calendarItems }, { additionalProperties: false }),
@@ -93,7 +118,7 @@ const definitions = [
   }
 ];
 var index_default = definePluginEntry({
-  id: "tutor",
+  id: "tutor-study",
   name: "Tutor",
   description: "Agent-scoped topic notes, assessment dates, and on-demand two-day study guides; no calendar writes or background scan.",
   register(api) {

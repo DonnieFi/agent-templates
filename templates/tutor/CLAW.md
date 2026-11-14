@@ -20,6 +20,8 @@ agent:
       - search_topics
       - list_assessments
       - save_assessment
+      - delete_topic
+      - delete_assessment
       - get_due_study_guides
     fs:
       workspaceOnly: true

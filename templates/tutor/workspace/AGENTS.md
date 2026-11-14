@@ -13,9 +13,12 @@
 
 ## Native tools
 
-- `get_tutor_setup` / `save_tutor_setup`: record the visible calendar tool.
-- `list_topics` / `save_topic` / `search_topics`: manage and read topic notes.
-- `list_assessments` / `save_assessment`: merge and store assessment dates.
+- `get_tutor_setup` / `save_tutor_setup`: record the visible calendar tool and an
+  optional IANA timezone.
+- `list_topics` / `save_topic` / `delete_topic` / `search_topics`: manage and read
+  topic notes.
+- `list_assessments` / `save_assessment` / `delete_assessment`: merge and store
+  assessment dates. Deleting an assessment also drops its stored guide.
 - `get_due_study_guides`: the only study-guide read and write.
 
 State is agent-scoped in the plugin store. Do not claim a topic, date, or guide is
@@ -26,19 +29,26 @@ saved unless the tool returned it.
 1. Check the visible session tools for a calendar. Do not assume Family Pack is
    installed. Do not install or create a calendar.
 2. Record the tool name with `save_tutor_setup`, or `null` when none is visible.
-3. When `family_schedule` is the calendar:
+3. Ask once which timezone dates should use. Save an IANA name with
+   `save_tutor_setup({ timezone })`, for example `America/Halifax`. Skip, or pass
+   `null`, to use the gateway host's local date. Today and the two-day window
+   follow that choice.
+4. When `family_schedule` is the calendar:
    - Call it with `{ days: 7 }` and **no** `query`.
    - Without `query`, `days` defaults to 1. With `query`, every word must appear
      in the title, so a keyword such as `test quiz exam` matches nothing.
    - Read the returned sections and look for test, quiz, and exam titles locally.
-   - Convert the displayed date (for example, “Fri Oct 9”) to `YYYY-MM-DD` before
-     passing it to the Tutor tools. Use the displayed time as text, such as
-     `8:05 AM`.
-4. Pass the found items as `calendarItems` to `list_assessments` and
+   - Pass the displayed date, such as `Fri Oct 9`, through as `date`. The plugin
+     resolves it. An unrecognized item comes back in `skippedCalendarItems`; ask
+     for that date and keep the rest of the call. Use the displayed time as text,
+     such as `8:05 AM`.
+5. Pass the found items as `calendarItems` to `list_assessments` and
    `get_due_study_guides`. Do not save a calendar item as a hand-entered date.
-5. The calendar remains the date authority. If the calendar is unavailable or the
+6. The calendar remains the date authority. If the calendar is unavailable or the
    call fails, say so and use hand-entered dates. Do not invent a date.
-6. Do not create, edit, or delete calendar events in v1.
+7. Do not create, edit, or delete calendar events in v1.
+8. Call `delete_topic` or `delete_assessment` only after the person confirms.
+   A full store is shrunk that way. Calendar events stay in the calendar.
 
 If no calendar tool is visible, topic search and hand-entered dates still work.
 The setup tool returns the two-day-guide reminder once; do not repeat it.

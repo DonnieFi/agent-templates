@@ -15,7 +15,7 @@ It has no channel delivery, background watch, recipe API, or purchase path.
 - `search_flyer_deals` — search current public flyer listings for one item.
 - `check_flyer_watch` — search the grocery list and upcoming meal ingredients.
 - `get_meals_setup` — read flyer setup; the postal code is masked.
-- `save_meals_setup` — save or clear the postal code and store list.
+- `save_meals_setup` — save or clear the postal code, store list, and IANA timezone.
 - `save_week_suggestion` — store a proposed week without applying it.
 
 Meals and grocery items are keyed by the host-supplied agent ID. A different agent
@@ -31,9 +31,12 @@ postal code and no default store list. Without a postal code, every other tool
 still works and flyer tools return `configured: false` with a note.
 
 `check_flyer_watch` is on demand. It checks at most 12 unique items drawn from the
-current grocery list and ingredients on saved meals that are not in the past. It
-does not start a watch, poll in the background, or send a message. Responses are
-bounded; an unavailable provider or a partial check is reported as such.
+current grocery list and ingredients on saved meals that are not in the past. Past
+uses the saved IANA timezone when one is set, and the gateway host's local date
+otherwise. It does not start a watch, poll in the background, or send a message.
+Responses are bounded. An unavailable provider or a partial check is reported as
+such. When the 12-item cap is hit, the remaining items are later meals and grocery
+lines, not meals already in the past.
 
 Flyer results are listings, not price guarantees. Availability, coverage, and
 provider terms can change. The plugin does not bypass authentication or scrape a
@@ -60,8 +63,9 @@ write workspace files, log the postal code, or share state between agents.
 
 ## Template hookup
 
-The Meals template vendors a pinned build under `plugins/meals/` and grants only
-the eleven tool names above plus workspace read. The template does not declare
+The plugin id is `meals-planner`. The Meals template vendors a pinned build under
+`plugins/meals/` and grants only the eleven tool names above plus workspace read.
+The template does not declare
 Family Pack as a requirement. A visible `family_members` tool can support a
 conversational check with a parent, but the plugin does not implement an approval
 gate.

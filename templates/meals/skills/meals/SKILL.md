@@ -6,7 +6,7 @@ description: Plan a week of dinners, keep an agent-scoped grocery list, and chec
 # Meals with the Meals plugin
 
 Use for meal plans, grocery lists, week suggestions, and optional flyer checks.
-This skill uses the eleven native `meals` plugin tools. It does not use a recipe
+This skill uses the eleven native `meals-planner` plugin tools. It does not use a recipe
 API, a channel, a calendar, or a background watch.
 
 ## 1. Read before asking
@@ -33,8 +33,11 @@ Flyer search needs a postal code. Everything else works without one.
    - Pass `null` to clear it.
    - `stores` replaces the list; `[]` clears it.
 3. Never read the full postal code back. Use the returned `postalCodeHint`.
-4. If they skip, continue with the plan and list. Do not ask again in the same
-   conversation.
+4. Ask once which timezone upcoming meals should use. Save an IANA name with
+   `save_meals_setup({ timezone })`, for example `America/Halifax`. Skip, or pass
+   `null`, to use the gateway host's local date.
+5. If they skip flyer setup, continue with the plan and list. Do not ask again
+   in the same conversation.
 
 There is no default postal code and no default store list. Do not invent either.
 

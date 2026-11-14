@@ -1,17 +1,17 @@
 # Meals setup and operator notes
 
-Meals uses the bundled native `meals` plugin. The template stages the tested
+Meals uses the bundled native `meals-planner` plugin. The template stages the tested
 build; it does not require Family Pack, a recipe API, Discord, or a background
 job.
 
 ## Pinned build
 
 - Package: `openclaw-meals-plugin@0.1.0`
-- Plugin ID: `meals`
+- Plugin ID: `meals-planner`
 - Artifact: `openclaw-meals-plugin-0.1.0.tgz`
-- SHA-256: `7a6c27a84afdc1d418c1197c48e3a907d7654832d42c202225ca923de28f4fa6`
+- SHA-256: `529571bd0d102e0d251f68132be5a426bf8134fd19b02ee1add0e0054a1d0558`
 - Source: https://github.com/DonnieFi/openclaw-meals
-- Source commit: `67ce23db4edce0af275deabe09e6248e438524ce`
+- Source commit: `9ad9cb0e090f47da9d96641ff0e62ac0fc8cf14e`
 - Staged path: `plugins/meals/` with compiled `dist/`, `package.json`,
   `openclaw.plugin.json`, `README.md`, and `LICENSE`
 
@@ -48,17 +48,21 @@ tool profile, with `fs.workspaceOnly: true`.
 - whether a postal code is present,
 - a masked hint such as `X0X***`,
 - the configured stores and whether the list is set,
+- the saved IANA timezone, and whether one is set,
 - whether flyer search is available.
 
-`save_meals_setup` accepts `postalCode` and `stores`.
+`save_meals_setup` accepts `postalCode`, `stores`, and `timezone`.
 
 - Omit `postalCode` to keep it.
 - Pass `null` to clear it.
 - Pass a string to replace it.
 - `stores` replaces the list; `[]` clears it.
+- `timezone` is an IANA name such as `America/Halifax`. `null` clears it and
+  upcoming meals use the gateway host's local date.
 
-There is no default postal code and no default store list. Setup can skip either.
-Without a postal code, meals, the grocery list, and week suggestions still work.
+There is no default postal code, store list, or timezone. Setup can skip any of
+them. Without a postal code, meals, the grocery list, and week suggestions still
+work.
 
 The full postal code is not returned by either setup tool and is not written to
 a workspace file. The plugin uses it only to construct the flyer request; the
@@ -68,9 +72,11 @@ public flyer provider receives it as part of that request.
 
 `search_flyer_deals` uses the public Flipp item search endpoint when a postal
 code is saved. `check_flyer_watch` makes the same on-demand search for the current
-grocery list and ingredients on saved meals that are not in the past. It is
-bounded to 12 unique items, four concurrent requests, and ten seconds per
-request.
+grocery list and ingredients on saved meals that are not in the past. "Not in
+the past" uses the saved timezone, or the gateway host's local date when none
+is saved. The check is bounded to 12 unique items, four concurrent requests,
+and ten seconds per request. Items past that cap stay on the grocery list or
+on later meals.
 
 - Store names filter by merchant name, ignoring case and punctuation.
 - Expired and not-yet-valid listings are removed.

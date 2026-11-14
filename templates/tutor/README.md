@@ -12,16 +12,16 @@ background scan, or channel delivery.
 - **Bundled tutor skill** (`skills/tutor`): coordinates calendar discovery,
   `family_schedule` reading, topic notes, assessment merging, and study guides.
 - **Bundled native tutor plugin** (`plugins/tutor/`):
-  `openclaw-tutor-plugin@0.1.0`, providing the eight tools listed below. The
+  `openclaw-tutor-plugin@0.1.0` (`tutor-study`), providing the ten tools listed below. The
   plugin owns its state; the template ships no students, topics, dates, grades,
   or syllabi.
 
 ## Native tools
 
-- `get_tutor_setup` / `save_tutor_setup`: record the visible calendar tool.
-- `list_topics` / `save_topic` / `search_topics`: manage saved notes.
-- `list_assessments` / `save_assessment`: merge calendar items with hand-entered
-  dates, or save a date the person gives.
+- `get_tutor_setup` / `save_tutor_setup`: record the visible calendar tool and an optional IANA timezone.
+- `list_topics` / `save_topic` / `delete_topic` / `search_topics`: manage saved notes.
+- `list_assessments` / `save_assessment` / `delete_assessment`: merge calendar items with hand-entered
+  dates, save a date the person gives, or remove one.
 - `get_due_study_guides`: build, store, and return a guide inside the two-day
   window. This is the only guide read and write.
 
@@ -35,8 +35,8 @@ one source. When it is used:
 - with `query`, every word must appear in the title, so `test quiz exam` matches
   nothing;
 - read the returned sections and find test, quiz, and exam titles locally;
-- convert display dates to `YYYY-MM-DD`;
-- pass them to the Tutor tools as `calendarItems`.
+- pass display dates such as `Fri Oct 9` through as `calendarItems`;
+- the plugin resolves those dates and skips an unrecognized item without failing the rest.
 
 The calendar remains the date authority. The tutor does not create calendar events
 in v1. Without a calendar, topic search and hand-entered dates still work. Setup
@@ -96,9 +96,9 @@ or establish calendar coverage. The README is also mapped into
 ## Source
 
 The plugin source is [DonnieFi/openclaw-tutor](https://github.com/DonnieFi/openclaw-tutor),
-at source commit `a39fa6ff4cca228b55effb4469d7afc4e56f495f`. The template vendors
+at source commit `a1c7967de81296f51a4532cb53dccc90586f5ca9`. The template vendors
 only the tested build: `openclaw-tutor-plugin@0.1.0`, artifact SHA-256
-`132160ed6e734eca5b5dbed4f04b37b6337adf57c4d75a87b17434d21cf11fb8`.
+`d389213e1e19abecd4c6ba5ae945f98078c7fc0bf3c2360d2346741e16cf4d26`.
 
 No private student records, real syllabi, raw conversations, or machine-specific
 paths are included.

@@ -6,7 +6,7 @@ description: Track topic notes and assessment dates, use a visible calendar when
 # Studying with the Tutor plugin
 
 Use for topic notes, test and quiz dates, calendar-aware study planning, and
-study guides. This skill uses the eight native `tutor` plugin tools. It does not
+study guides. This skill uses the ten native `tutor-study` plugin tools. It does not
 create calendar events, run a background scan, or write a finished assignment.
 
 ## 1. Read setup and saved work
@@ -33,6 +33,11 @@ install, create, or change a calendar.
   the two-day guide needs a calendar or a date they type in. The tool returns the
   reminder once; do not repeat it every turn.
 
+Ask once which timezone dates should use. Save an IANA name with
+`save_tutor_setup({ timezone })`, for example `America/Halifax`. Skip, or pass
+`null`, to use the gateway host's local date. Today and the two-day window follow
+that choice.
+
 The plugin stores the tool name but cannot see other tools itself. The skill is
 responsible for checking visibility and for passing calendar items into the
 plugin.
@@ -50,13 +55,14 @@ When `family_schedule` is the visible calendar:
    under “not the usual”, “homework”, or another section.
 3. For each match, collect:
    - `title`
-   - `date` in `YYYY-MM-DD` form
+   - `date` as returned, including a display date such as `Fri Oct 9`
    - `time` when present, as text such as `8:05 AM`
    - `subject` when known, otherwise omit it
    - `source: "family_schedule"`
-4. The schedule returns display dates such as `Fri Oct 9`. Convert them to
-   `YYYY-MM-DD` using the current year and the weekday. If the date is missing or
-   ambiguous, ask instead of guessing.
+4. Pass the schedule's display date, such as `Fri Oct 9`, through as `date`.
+   The plugin accepts that form and `YYYY-MM-DD`. It reports an unrecognized
+   item in `skippedCalendarItems` and still returns the other items. If an item
+   is skipped, ask for that date. Do not drop the whole call.
 5. Pass the collected items as `calendarItems` to `list_assessments` and
    `get_due_study_guides`. Do not save a calendar item with `save_assessment`;
    the calendar remains the date authority.
@@ -91,6 +97,9 @@ hand-entered dates and do not invent one.
 - Use `save_assessment({ subject, title, date, time, notes })` for a date the
   person gives directly. It replaces an existing hand-entered date with the same
   subject and title.
+- Use `delete_topic({ subject, title })` or `delete_assessment({ subject, title })`
+  only after the person confirms. Deleting an assessment also drops its stored
+  study guide. A full store can be shrunk this way.
 - Use `list_assessments({ days, calendarItems })` to merge hand-entered dates
   with the calendar items. The plugin returns the source for each item: `tutor`,
   `calendar`, or `both`.

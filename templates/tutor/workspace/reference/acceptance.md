@@ -41,8 +41,15 @@ and a real conversation are separate forms of evidence.
   copy or duplicated.
 - **Duplicates**: The same calendar item passed twice appears once.
 - **Range**: Items outside the requested day range are excluded.
-- **Bad date**: An impossible date or a non-date display string is rejected with
-  a clear error.
+- **Display date**: A calendar date such as `Fri Oct 9` is accepted and resolved
+  near today. A hand-entered `save_assessment` date stays `YYYY-MM-DD`.
+- **Skipped item**: One unrecognized calendar item is reported in
+  `skippedCalendarItems`. The other items in that call still return.
+- **Delete**: A confirmed `delete_topic` or `delete_assessment` removes that
+  record. Deleting an assessment also drops its stored guide. A second delete
+  reports no match.
+- **Timezone**: A saved IANA timezone decides today and the two-day window. With
+  none saved, those dates use the gateway host's local date.
 
 ## 4. Study guides
 

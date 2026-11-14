@@ -4,6 +4,7 @@ import {
   asStringArray,
   cleanText,
   isDate,
+  isTimeZone,
   maskPostal,
   normalizeName,
   normalizePostal,
@@ -22,7 +23,7 @@ const SOURCE = "Flipp public flyer search";
 function emptyState() {
   return {
     version: 1,
-    setup: { postalCode: null, stores: [], updatedAt: null },
+    setup: { postalCode: null, stores: [], timezone: null, updatedAt: null },
     meals: [],
     grocery: [],
     suggestion: null
@@ -79,6 +80,7 @@ function normalizeState(value) {
     setup: {
       postalCode: typeof setup.postalCode === "string" ? setup.postalCode : null,
       stores: asStringArray(setup.stores, 12),
+      timezone: typeof setup.timezone === "string" ? setup.timezone : null,
       updatedAt: typeof setup.updatedAt === "string" ? setup.updatedAt : null
     },
     meals,
@@ -104,6 +106,8 @@ function setupSummary(setup) {
     postalCodeHint: maskPostal(setup.postalCode),
     stores: [...setup.stores],
     storesSet: setup.stores.length > 0,
+    timezone: setup.timezone,
+    timezoneSet: Boolean(setup.timezone),
     flyerSearchAvailable: Boolean(setup.postalCode),
     note: setup.postalCode ? "Flyer search uses this postal code and the selected stores. It never posts or messages anyone." : "No postal code is saved. Meals, the grocery list, and week suggestions still work; flyer search needs a postal code."
   };
@@ -293,6 +297,14 @@ class MealsService {
       state.setup.postalCode = input.postalCode === null ? null : normalizePostal(input.postalCode);
     }
     if (input.stores !== void 0) state.setup.stores = uniqueStrings(input.stores, 12, 60);
+    if (input.timezone !== void 0) {
+      if (input.timezone === null || input.timezone.trim() === "") state.setup.timezone = null;
+      else {
+        const zone = input.timezone.trim();
+        if (!isTimeZone(zone)) throw new Error("timezone must be an IANA name such as America/Halifax, or null to use the gateway host clock.");
+        state.setup.timezone = zone;
+      }
+    }
     state.setup.updatedAt = new Date(this.now()).toISOString();
     await this.save(state, scope);
     return setupSummary(state.setup);
@@ -317,7 +329,7 @@ class MealsService {
     const limit = input.limit ?? WATCH_DEALS_PER_ITEM;
     if (!Number.isInteger(limit) || limit < 1 || limit > 10) throw new Error("limit must be between 1 and 10.");
     const state = await this.load(scope);
-    const current = today(this.now());
+    const current = today(this.now(), state.setup.timezone);
     const names = [
       ...state.grocery.map((item) => item.name),
       ...state.meals.filter((meal) => meal.day >= current).flatMap((meal) => meal.ingredients)
@@ -362,7 +374,7 @@ class MealsService {
       uniqueItemCount: all.length,
       truncated: all.length > items.length,
       results,
-      note: all.length > items.length ? `Checked ${items.length} of ${all.length} unique items. Shorten the grocery list or remove past meals to cover the rest.` : "Flyer matches are current listings, not price guarantees. Confirm the price and dates in the store flyer."
+      note: all.length > items.length ? `Checked ${items.length} of ${all.length} unique items. The rest are still on the grocery list or on later meals.` : "Flyer matches are current listings, not price guarantees. Confirm the price and dates in the store flyer."
     };
   }
 }

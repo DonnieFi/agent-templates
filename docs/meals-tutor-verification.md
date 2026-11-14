@@ -137,3 +137,46 @@ Template artifact integrity:
   exercised in conversation.
 - Provider coverage, terms, and price accuracy for flyer search.
 - ClawHub publication and any community showcase post.
+
+## Review follow-up — 2026-11-14
+
+Same CLI and Node as above. This pass supersedes the plugin source pins, plugin
+artifact hashes, and template archive hashes recorded earlier on this page.
+The earlier test counts described the first v1 build.
+
+Plugin source:
+
+- [DonnieFi/openclaw-meals](https://github.com/DonnieFi/openclaw-meals) at
+  `9ad9cb0e090f47da9d96641ff0e62ac0fc8cf14e`. Plugin id `meals-planner`.
+  Package `openclaw-meals-plugin@0.1.0`. Artifact SHA-256
+  `529571bd0d102e0d251f68132be5a426bf8134fd19b02ee1add0e0054a1d0558`.
+- [DonnieFi/openclaw-tutor](https://github.com/DonnieFi/openclaw-tutor) at
+  `a1c7967de81296f51a4532cb53dccc90586f5ca9`. Plugin id `tutor-study`.
+  Package `openclaw-tutor-plugin@0.1.0`. Artifact SHA-256
+  `d389213e1e19abecd4c6ba5ae945f98078c7fc0bf3c2360d2346741e16cf4d26`.
+
+`npm test` in each plugin repository: Meals 12/12, Tutor 12/12. New coverage is
+a saved IANA timezone for “today”, Meals leaving a truncated flyer check on the
+grocery list or later meals, Tutor resolving a display date such as `Fri Oct 9`,
+skipping one unrecognized calendar item, and `delete_topic` /
+`delete_assessment`. No network or host state was touched.
+
+`openclaw templates validate`, offline `dev`, `inspect`, and `build` passed
+again for `./templates/meals` and `./templates/tutor`. Each still reports one
+agent, one skill, one bundled plugin, zero MCP servers, zero automations, 11
+preview actions, 3 capability escalations, and 0 blocked actions. Those preview
+actions are the install plan (agent, workspace files, skill, and plugin). The
+Tutor allow list includes `delete_topic` and `delete_assessment`. Each build
+reported 0 excluded project paths.
+
+Template archive integrity, superseding the hashes above:
+
+- `dist/meals-0.1.0.tgz`:
+  `sha256:71685e701d745cdc5be396fa583eefa83fea5c52c7e16c910d1b0332019729c4`
+- `dist/tutor-0.1.0.tgz`:
+  `sha256:9919bdc7962db89d06e38cbc1b34157f01d4efa951c103f27df5259274d5350c`
+
+Agent ids stay `meals` and `tutor`. Study-guide reuse until the assessment date
+passes is unchanged. No cron, Spoonacular, Discord delivery, or Family Pack
+`requiresPlugins` entry was added. No live flyer request, live calendar call,
+Template Add, or model conversation was run.

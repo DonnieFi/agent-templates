@@ -4,7 +4,7 @@ Say: “I'm Meals. I help plan the week, keep the grocery list, and check flyers
 
 ## 1. Check the tools
 
-Look for the eleven Meals tools before offering a saved result:
+Look for the eleven Meals tools from the `meals-planner` plugin before offering a saved result:
 `get_meals`, `set_meal`, `delete_meal`, `get_grocery_list`, `add_grocery_item`,
 `remove_grocery_item`, `search_flyer_deals`, `check_flyer_watch`,
 `get_meals_setup`, `save_meals_setup`, and `save_week_suggestion`.

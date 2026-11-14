@@ -163,3 +163,12 @@ Observed 2026-11-14 with OpenClaw 2026.11.3 (17db247).
 - `openclaw templates validate`, offline `dev`, `inspect`, and `build` passed for both packages. Each reports one agent, one skill, one bundled plugin, zero MCP servers, zero automations, and zero blocked preview actions.
 - Meals archive SHA-256: `a53b46e9dce71e243b0b6721c6f4d26de1a214a1145c80f407ede7ef9e213c40`. Tutor archive SHA-256: `2e7ef54b541e130883ec1f85b18f97e03885ba8603bcfb53850b5c67825f766a`.
 - No live flyer request, live calendar call, Template Add, model conversation, Family Pack install, or package-registry/ClawHub publication is part of this proof. See [meals-tutor-verification.md](meals-tutor-verification.md) for the detailed boundary list.
+
+## Meals and Tutor review follow-up — 2026-11-14
+
+- Plugin ids are `meals-planner` and `tutor-study`. Agent ids stay `meals` and `tutor`.
+- Plugin tests passed again: Meals 12/12 at `9ad9cb0e090f47da9d96641ff0e62ac0fc8cf14e`, Tutor 12/12 at `a1c7967de81296f51a4532cb53dccc90586f5ca9`. Fixtures only. No network or host state was touched.
+- `openclaw templates validate`, offline `dev`, `inspect`, and `build` passed again. Each still reports 11 preview actions, 3 capability escalations, and 0 blocked actions. The Tutor allow list includes `delete_topic` and `delete_assessment`.
+- Meals archive SHA-256: `71685e701d745cdc5be396fa583eefa83fea5c52c7e16c910d1b0332019729c4`. Tutor archive SHA-256: `9919bdc7962db89d06e38cbc1b34157f01d4efa951c103f27df5259274d5350c`. These supersede the archive hashes in the section above.
+- Plugin artifact SHA-256: Meals `529571bd0d102e0d251f68132be5a426bf8134fd19b02ee1add0e0054a1d0558`, Tutor `d389213e1e19abecd4c6ba5ae945f98078c7fc0bf3c2360d2346741e16cf4d26`.
+- No live flyer request, live calendar call, Template Add, model conversation, Family Pack install, or publication was added in this pass.

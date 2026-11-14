@@ -88,11 +88,12 @@ const definitions = [
   },
   {
     name: "save_meals_setup",
-    description: "Save flyer setup for this agent. Omit postalCode to keep it, pass null to clear it, or pass a postal code to replace it. stores replaces the list; an empty list clears it. Output masks the postal code.",
+    description: "Save flyer setup for this agent. Omit postalCode to keep it, pass null to clear it, or pass a postal code to replace it. stores replaces the list; an empty list clears it. timezone is an IANA name used for upcoming meals; null uses the gateway host clock. Output masks the postal code.",
     parameters: Type.Object(
       {
         postalCode: Type.Optional(Type.Union([Type.String({ maxLength: 10 }), Type.Null()])),
-        stores: Type.Optional(Type.Array(Type.String({ maxLength: 60 }), { maxItems: 12 }))
+        stores: Type.Optional(Type.Array(Type.String({ maxLength: 60 }), { maxItems: 12 })),
+        timezone: Type.Optional(Type.Union([Type.String({ maxLength: 80 }), Type.Null()]))
       },
       { additionalProperties: false }
     ),
@@ -109,7 +110,7 @@ const definitions = [
   }
 ];
 var index_default = definePluginEntry({
-  id: "meals",
+  id: "meals-planner",
   name: "Meals",
   description: "Agent-scoped meal plans, grocery lists, and optional flyer deal search; no channel delivery or background watch.",
   register(api) {

@@ -5,7 +5,25 @@ function isDate(value) {
   const parsed = /* @__PURE__ */ new Date(`${value}T12:00:00Z`);
   return !Number.isNaN(parsed.getTime()) && parsed.toISOString().slice(0, 10) === value;
 }
-function today(now) {
+function isTimeZone(value) {
+  try {
+    Intl.DateTimeFormat(void 0, { timeZone: value });
+    return true;
+  } catch {
+    return false;
+  }
+}
+function today(now, timeZone) {
+  if (timeZone) {
+    const parts = new Intl.DateTimeFormat("en-CA", {
+      timeZone,
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit"
+    }).formatToParts(new Date(now));
+    const part = (type) => parts.find((entry) => entry.type === type)?.value ?? "";
+    return `${part("year")}-${part("month")}-${part("day")}`;
+  }
   const date = new Date(now);
   return [
     date.getFullYear(),
@@ -73,6 +91,7 @@ export {
   asStringArray,
   cleanText,
   isDate,
+  isTimeZone,
   maskPostal,
   normalizeName,
   normalizePostal,

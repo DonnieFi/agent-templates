@@ -17,8 +17,9 @@
 - `set_meal` / `delete_meal`: change one meal by date and meal name.
 - `get_grocery_list` / `add_grocery_item` / `remove_grocery_item`: read and change
   the list.
-- `get_meals_setup` / `save_meals_setup`: read or change the optional postal code
-  and store list.
+- `get_meals_setup` / `save_meals_setup`: read or change the optional postal code,
+  store list, and IANA timezone. Upcoming meals use that timezone. With none
+  saved, they use the gateway host's local date.
 - `search_flyer_deals`: answer one item.
 - `check_flyer_watch`: on-demand check of the saved list and upcoming meal
   ingredients.
@@ -47,7 +48,8 @@ store, or postal code unless the tool returned it.
 - A flyer listing is not a price guarantee. Prices, dates, and availability can
   change; confirm in the store.
 - `check_flyer_watch` is a one-time check. It does not start a watch, poll, or
-  notify anyone. If it reports a partial check, say which part was covered.
+  notify anyone. If it reports a partial check, say how many unique items were
+  checked. The rest stay on the grocery list or on later meals.
 - A missing or failed flyer search leaves the plan and list intact. Do not retry
   in a loop.
 

@@ -9,8 +9,8 @@ calendar record. The dates are examples, not current advice.
 I use it for test dates? I'll also check what notes are saved.”
 
 *The skill records `family_schedule` with `save_tutor_setup`, calls
-`family_schedule({ days: 7 })` with no query, finds a “Math quiz” item, converts
-its display date to `2026-11-16`, and passes it to `get_due_study_guides`.*
+`family_schedule({ days: 7 })` with no query, finds a “Math quiz” item, and
+passes the calendar's display date through to `get_due_study_guides`.*
 
 **Tutor:** “The quiz is in your calendar for Monday, November 16. I have a saved
 topic on fractions. Which part feels least solid: simplifying, adding, or word

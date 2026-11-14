@@ -1,17 +1,17 @@
 # Tutor setup and operator notes
 
-Tutor uses the bundled native `tutor` plugin. The template stages the tested
+Tutor uses the bundled native `tutor-study` plugin. The template stages the tested
 build; it does not require Family Pack, install a calendar, or run a background
 scan.
 
 ## Pinned build
 
 - Package: `openclaw-tutor-plugin@0.1.0`
-- Plugin ID: `tutor`
+- Plugin ID: `tutor-study`
 - Artifact: `openclaw-tutor-plugin-0.1.0.tgz`
-- SHA-256: `132160ed6e734eca5b5dbed4f04b37b6337adf57c4d75a87b17434d21cf11fb8`
+- SHA-256: `d389213e1e19abecd4c6ba5ae945f98078c7fc0bf3c2360d2346741e16cf4d26`
 - Source: https://github.com/DonnieFi/openclaw-tutor
-- Source commit: `a39fa6ff4cca228b55effb4469d7afc4e56f495f`
+- Source commit: `a1c7967de81296f51a4532cb53dccc90586f5ca9`
 - Staged path: `plugins/tutor/` with compiled `dist/`, `package.json`,
   `openclaw.plugin.json`, `README.md`, and `LICENSE`
 
@@ -24,7 +24,7 @@ The plugin stores one record per host-supplied agent ID in the `tutor-state`
 keyed store. It contains the setup record, topic notes, hand-entered assessment
 dates, and stored study guides. A different agent does not see them.
 
-The eight tools are:
+The ten tools are:
 
 1. `get_tutor_setup`
 2. `save_tutor_setup`
@@ -33,7 +33,9 @@ The eight tools are:
 5. `search_topics`
 6. `list_assessments`
 7. `save_assessment`
-8. `get_due_study_guides`
+8. `delete_topic`
+9. `delete_assessment`
+10. `get_due_study_guides`
 
 The template grants exactly those names plus workspace `read` under a minimal
 tool profile, with `fs.workspaceOnly: true`.
@@ -50,7 +52,11 @@ Family Pack's `family_schedule` is supported as one calendar source:
 - Without `query`, `days` defaults to 1. With `query`, every word must appear in
   the title, so `test quiz exam` matches nothing.
 - Read the returned sections and look for test, quiz, and exam titles locally.
-- Convert display dates such as `Fri Oct 9` to `YYYY-MM-DD` before passing them.
+- Pass display dates such as `Fri Oct 9` through. The plugin resolves them.
+  An unrecognized item is reported in `skippedCalendarItems` and does not fail
+  the rest of the call.
+- Today and the two-day window use the IANA timezone saved with
+  `save_tutor_setup`. With none saved, they use the gateway host's local date.
 - The calendar remains the date authority.
 - The tutor does not create or change calendar events in v1.
 

@@ -4,10 +4,10 @@ Say: “I'm Tutor. I help you keep track of what to study and build a guide befo
 
 ## 1. Check the tools
 
-Look for the eight Tutor tools:
+Look for the ten Tutor tools:
 `get_tutor_setup`, `save_tutor_setup`, `list_topics`, `save_topic`,
-`search_topics`, `list_assessments`, `save_assessment`, and
-`get_due_study_guides`.
+`search_topics`, `list_assessments`, `save_assessment`, `delete_topic`,
+`delete_assessment`, and `get_due_study_guides`.
 
 Also look at the visible tool list for a calendar. Family Pack's
 `family_schedule` is one example. Do not install or invent a calendar.

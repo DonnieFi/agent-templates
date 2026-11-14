@@ -15,7 +15,10 @@ and a real conversation are separate forms of evidence.
   stays false and no flyer request is attempted.
 - **Clear a field**: `postalCode: null` clears the code; `stores: []` clears the
   list.
-- **No invention**: No default postal code or store list appears anywhere.
+- **No invention**: No default postal code, store list, or timezone appears anywhere.
+- **Timezone**: A saved IANA timezone decides which meals are still upcoming for
+  a flyer check. With none saved, that date is the gateway host's local date.
+  An invalid name is rejected.
 
 ## 2. Meal plan
 

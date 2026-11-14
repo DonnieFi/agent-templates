@@ -12,7 +12,7 @@ deal checks. No recipe API, channel delivery, or background watch is required.
   grocery updates, one-item flyer search, an on-demand watch check, and a saved
   week suggestion.
 - **Bundled native meals plugin** (`plugins/meals/`):
-  `openclaw-meals-plugin@0.1.0`, providing the eleven tools listed below. The
+  `openclaw-meals-plugin@0.1.0` (`meals-planner`), providing the eleven tools listed below. The
   plugin owns its state; the template ships no meals, grocery items, postal codes,
   or store names.
 
@@ -25,8 +25,9 @@ deal checks. No recipe API, channel delivery, or background watch is required.
 - `search_flyer_deals`: search current public flyer listings for one item.
 - `check_flyer_watch`: on-demand check of the grocery list and upcoming meal
   ingredients, at most 12 unique items.
-- `get_meals_setup` / `save_meals_setup`: read or change the optional postal code
-  and store list. The full postal code is never returned.
+- `get_meals_setup` / `save_meals_setup`: read or change the optional postal code,
+  store list, and IANA timezone. The full postal code is never returned. Upcoming
+  meals use that timezone. With none saved, they use the gateway host's local date.
 - `save_week_suggestion`: store a proposed week without applying or sending it.
 
 ## First useful week
@@ -81,9 +82,9 @@ or establish provider coverage. The README is also mapped into
 ## Source
 
 The plugin source is [DonnieFi/openclaw-meals](https://github.com/DonnieFi/openclaw-meals),
-at source commit `67ce23db4edce0af275deabe09e6248e438524ce`. The template vendors
+at source commit `9ad9cb0e090f47da9d96641ff0e62ac0fc8cf14e`. The template vendors
 only the tested build: `openclaw-meals-plugin@0.1.0`, artifact SHA-256
-`7a6c27a84afdc1d418c1197c48e3a907d7654832d42c202225ca923de28f4fa6`.
+`529571bd0d102e0d251f68132be5a426bf8134fd19b02ee1add0e0054a1d0558`.
 
 No private household records, real postal codes, store lists, raw conversations,
 or machine-specific paths are included.
