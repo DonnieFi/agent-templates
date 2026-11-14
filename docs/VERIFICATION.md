@@ -124,3 +124,17 @@ snapshot of the relevant files instead.
   separately verified private persistence capability.
 
 The review did not request fake watcher support or weaker privacy boundaries.
+
+# Bernie verification
+
+Observed 2026-11-14 with OpenClaw 2026.11.3 (17db247).
+
+- Reviewed all five files added by dc84861: no private family records, real locations, account IDs, credentials, raw conversations, or machine-specific paths were found in the package.
+- Optional Discord guide checked against current OpenClaw Discord setup documentation and installed `agents bind --help`. It reuses an existing application/account, requires operator authority and explicit routing cutover, keeps secrets outside the package/chat/command arguments, and preserves pairing and allowlists. No live bot connection, routing change, or access change was performed.
+- `openclaw templates validate templates/bernie`: passed.
+- `openclaw templates dev templates/bernie`: passed; five planned actions, one capability escalation, zero blocked actions. Existing agent-ID collision resolves to `bernie-2`; this is preview only, not an installed agent.
+- `openclaw templates inspect templates/bernie`: passed; zero skills, plugins, MCP servers, and automations. README is excluded from the built package; the Discord reference is explicitly mapped.
+- Model conversations, Template Add, Discord identity/reply tests, and receiving-host permissions remain untested. Acceptance scenarios in the README are review criteria, not passed tests.
+- No catalog/registry publication, installation, live messaging, or merge is authorized or performed by this verification.
+
+- `openclaw templates build templates/bernie --out dist/bernie-0.1.0.tgz`: passed; archive contains only CLAW.md, package.json, workspace/AGENTS.md, and workspace/discord.md. SHA-256: `3ddc5cbacac5eb9d2704d2cc9a8c5e151698791c4e12853dfce8c4308d6057aa`.
