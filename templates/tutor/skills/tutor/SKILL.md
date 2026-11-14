@@ -94,8 +94,9 @@ hand-entered dates and do not invent one.
 - Use `list_assessments({ days, calendarItems })` to merge hand-entered dates
   with the calendar items. The plugin returns the source for each item: `tutor`,
   `calendar`, or `both`.
-- The calendar wins on a date it supplies. Do not overwrite a calendar item with
-  a hand-entered copy or create a duplicate.
+- If a calendar item and a hand-entered date disagree, use the calendar date and
+  say the saved date differed. Do not overwrite the calendar or add a duplicate
+  hand-entered copy.
 - Do not guess a date, time, or subject. If the person is unsure, list what is
   known and ask.
 

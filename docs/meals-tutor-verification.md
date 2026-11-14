@@ -104,9 +104,9 @@ Observed:
 Template artifact integrity:
 
 - `dist/meals-0.1.0.tgz`:
-  `sha256:e86c75be7becadf659bcaf33b5b100da0a3a9e490c4af79ea5d15fbbcdf05d5e`
+  `sha256:180b908f711f5e96d8f10cf34b360c58bd9f67d3b83ded716bee58de3e92c196`
 - `dist/tutor-0.1.0.tgz`:
-  `sha256:a96035f5d7fadfd8bb9a9951c12d02c131d67fac8b08041c45bbf57d193d7b39`
+  `sha256:54083b17dbc2d2dc888d72c66a62034afebd9dad6e5213b5a24d195bab776bb1`
 
 ## Boundaries confirmed in the packages
 

@@ -111,7 +111,8 @@ the list checked.
 ## 7. Boundaries
 
 - Do not ask about Discord, channels, routing, or delivery.
-- Do not call `family_schedule` or other Family Pack tools from this skill.
+- Do not call `family_schedule` or another Family Pack tool from this skill.
+  `family_members` is allowed only for the optional parent check above.
 - Do not use a recipe API, order groceries, or start a standing sale watch.
 - Do not put the postal code, meal plan, or grocery list into workspace files.
 - If a tool fails with a permission error, explain that the concrete Meals tool

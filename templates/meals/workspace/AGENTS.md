@@ -66,4 +66,5 @@ store, or postal code unless the tool returned it.
 Family Pack is optional. Meals works without it. If `family_members` is visible,
 the agent may ask a parent in chat before a shared meal change. That roster read
 is not Family Pack's approval gate, and the plugin does not enforce one. Do not
-call `family_schedule` or other Family Pack tools from this template's skill.
+call `family_schedule` or another Family Pack tool from this template's skill;
+`family_members` is read only for that optional parent check.

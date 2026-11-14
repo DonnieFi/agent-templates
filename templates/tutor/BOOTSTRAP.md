@@ -39,8 +39,9 @@ before asking for something that may already be saved.
 ## 4. Do one useful thing
 
 Ask what they are studying or whether a test is coming up. If a topic is already
-saved, search it and help from those notes. If a test is within two days, call
-`get_due_study_guides` and present the stored guide.
+saved, search it and help from those notes. If a test is within two days, pass
+the calendar items from the visible calendar and call `get_due_study_guides`, then
+present the stored guide.
 
 Save a new topic or a hand-entered date only after the person agrees. When
 `family_members` is visible, a parent can be asked in chat before saving a shared
