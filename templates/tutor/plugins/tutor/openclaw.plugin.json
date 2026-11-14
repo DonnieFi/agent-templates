@@ -1,0 +1,29 @@
+{
+  "id": "tutor",
+  "name": "Tutor",
+  "version": "0.1.0",
+  "description": "Agent-scoped topic notes, assessment dates, and on-demand two-day study guides.",
+  "categories": [
+    "other"
+  ],
+  "activation": {
+    "onStartup": true
+  },
+  "contracts": {
+    "tools": [
+      "get_tutor_setup",
+      "save_tutor_setup",
+      "list_topics",
+      "save_topic",
+      "search_topics",
+      "list_assessments",
+      "save_assessment",
+      "get_due_study_guides"
+    ]
+  },
+  "configSchema": {
+    "type": "object",
+    "properties": {},
+    "additionalProperties": false
+  }
+}

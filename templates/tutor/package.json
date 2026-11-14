@@ -1,0 +1,9 @@
+{
+  "name": "tutor-study-companion",
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Tutor — keep topic notes and assessment dates, and build a study guide two days ahead.",
+  "openclaw": {
+    "template": "CLAW.md"
+  }
+}
