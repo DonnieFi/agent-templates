@@ -21,8 +21,9 @@ the `definePluginEntry` boundary. The shipped plugin is the esbuild output.
 
 ## Plugin tests
 
-Both plugins use a fake keyed store and a clock; Meals also uses a fictional
-flyer fixture. No network or host state is touched.
+Both plugins use a fake keyed store and a clock; Meals uses a fictional flyer
+fixture and Tutor uses a fictional calendar-item fixture. No network or host
+state is touched.
 
 ### Meals
 
