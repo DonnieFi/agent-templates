@@ -1,0 +1,9 @@
+{
+  "name": "meals-week-planner",
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Meals — plan a week of dinners, keep the grocery list, and check flyer deals.",
+  "openclaw": {
+    "template": "CLAW.md"
+  }
+}

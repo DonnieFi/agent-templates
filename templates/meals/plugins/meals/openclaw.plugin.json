@@ -1,0 +1,32 @@
+{
+  "id": "meals",
+  "name": "Meals",
+  "version": "0.1.0",
+  "description": "Agent-scoped meal plans, grocery lists, and optional flyer deal search.",
+  "categories": [
+    "other"
+  ],
+  "activation": {
+    "onStartup": true
+  },
+  "contracts": {
+    "tools": [
+      "get_meals",
+      "set_meal",
+      "delete_meal",
+      "get_grocery_list",
+      "add_grocery_item",
+      "remove_grocery_item",
+      "search_flyer_deals",
+      "check_flyer_watch",
+      "get_meals_setup",
+      "save_meals_setup",
+      "save_week_suggestion"
+    ]
+  },
+  "configSchema": {
+    "type": "object",
+    "properties": {},
+    "additionalProperties": false
+  }
+}
