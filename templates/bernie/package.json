@@ -1,0 +1,7 @@
+{
+  "name": "bernie-house-griffon",
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Bernie — a warm, practical house griffon.",
+  "openclaw": { "template": "CLAW.md" }
+}
