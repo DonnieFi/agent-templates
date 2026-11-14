@@ -1,98 +1,82 @@
 # Agent Templates
 
-Portable OpenClaw agents built around useful everyday jobs.
+This repo is the source for the OpenClaw Templates in this collection.
+A Template is a package that `openclaw templates add` turns into a new, ordinary OpenClaw agent.
 
-Packages under `templates/` represent agent templates for OpenClaw. In this collection, [Hopper](templates/hopper/), [Bernie](templates/bernie/), [Meals](templates/meals/), and [Tutor](templates/tutor/) are current-format, independently versioned OpenClaw Template packages; [starter-agent](templates/starter-agent/) is a legacy scaffold (retaining `agent.json` and `prompts/system.md` rather than an installable OpenClaw `CLAW.md`/`package.json` manifest). This source repository is separate from ClawHub publication: reviewing or merging source does not publish a registry package or install an agent.
+Each folder under `templates/` holds one Template.
+The package source sits at the root of that folder: `CLAW.md`, `package.json`, `workspace/`, and, when the package has them, `skills/` and `plugins/`.
+Reviewing or merging this source does not publish a registry package or install an agent.
 
-## Available Templates
+## Templates
 
-| Template | Description | Status |
-| :--- | :--- | :--- |
-| [**Hopper**](templates/hopper/) | Catch the right ride: conversational transit companion with stop/direction-aware departures, walking buffers, and live vs. scheduled status | Draft / Pilot |
-| [**Bernie**](templates/bernie/) | Household companion: practical help from what people share, plus consent-based local profiles for family and pets | Draft |
-| [**Meals**](templates/meals/) | Plan a week of dinners, keep an agent-scoped grocery list, and check optional flyer deals | Draft |
-| [**Tutor**](templates/tutor/) | Keep topic notes and assessment dates, use a visible calendar, and build a two-day study guide on demand | Draft |
-| [**Starter Agent**](templates/starter-agent/) | Minimal scaffold for building custom autonomous agents | Legacy scaffold—not installable |
+| Template | Package | ClawHub | Folder |
+|----------|---------|---------|--------|
+| [Hopper](templates/hopper/README.md) | `hopper-transit-companion@0.1.0` | Not published | [`templates/hopper/`](templates/hopper/) |
+| [Bernie](templates/bernie/README.md) | `bernie-house-griffon@0.1.0` | Not published | [`templates/bernie/`](templates/bernie/) |
+| [Meals](templates/meals/README.md) | `meals-week-planner@0.1.0` | Not published | [`templates/meals/`](templates/meals/) |
+| [Tutor](templates/tutor/README.md) | `tutor-study-companion@0.1.0` | Not published | [`templates/tutor/`](templates/tutor/) |
 
+The ClawHub column is a stub. These package names are the `package.json` names. They are not ClawHub slugs.
 
-### Hopper — Catch the right ride
+Each Template has its own `README.md` with the details.
 
-[Hopper](templates/hopper/) helps a rider find stops and useful departures, check direction and realtime freshness, and compare options using their walking time. It uses a capability-first discovery flow that reuses existing host transit integrations or guides missing setup honestly without hardcoded server assumptions. It does not require Home Assistant or continuous location tracking.
+[starter-agent](templates/starter-agent/) is a legacy scaffold (`agent.json` and `prompts/system.md`). It has no `CLAW.md` package.
 
-- **Status**: Initial draft. The manifest is reconciled for reuse-first tool discovery with zero automations. The candidate transit runtime has returned real Halifax predictions in an isolated protocol test. Complete receiving-host Add and model conversation proof, wider agency discovery, and background watches are unfinished. See [verification](docs/VERIFICATION.md) and Hopper's README for exact boundaries.
+Plugin source stays in its own repository. The Template vendors a pinned build.
 
-### Bernie — house griffon
+| Template | Plugin source |
+|----------|----------------|
+| Hopper | [DonnieFi/openclaw-gtfs](https://github.com/DonnieFi/openclaw-gtfs) |
+| Meals | [DonnieFi/openclaw-meals](https://github.com/DonnieFi/openclaw-meals) |
+| Tutor | [DonnieFi/openclaw-tutor](https://github.com/DonnieFi/openclaw-tutor) |
 
-[Bernie](templates/bernie/) is a household companion for practical planning from what people share. With permission, he keeps separate local Markdown profiles for family members and pets. The base package declares workspace read, write, and edit only. It does not bundle Family Pack, Home Assistant, calendars, reminders, credentials, or a Discord connection. An optional guide describes how an operator can route an existing Discord bot later.
+Bernie has no bundled plugin.
 
-- **Status**: Initial draft. Package validation, offline preview, inspection, and archive build are recorded. Model conversation, Template Add, live Discord identity and reply tests, and receiving-host permissions are unfinished. See [verification](docs/VERIFICATION.md) and Bernie's README for exact boundaries.
+Add one from this checkout:
 
-### Meals — plan the week
-
-[Meals](templates/meals/) keeps an agent-scoped meal plan, grocery list, and one pending week suggestion. Flyer search is optional: setup asks for a postal code and stores, both skippable, and there is no default for either. A one-item search and an on-demand watch cover the saved list and planned ingredients. Nothing is posted to a channel, and no background sale watch exists.
-
-- **Status**: Initial draft. Plugin tests, Template validation, offline preview, inspection, and archive build are recorded. Live flyer calls, Template Add, model conversation, receiving-host permissions, and provider coverage are unfinished. See [verification](docs/meals-tutor-verification.md) and Meals' README for exact boundaries.
-
-### Tutor — study two days ahead
-
-[Tutor](templates/tutor/) keeps topic notes and assessment dates, uses a visible calendar when one is present, and builds a stored study guide when someone talks to it inside the two-day window. It teaches and helps search notes; it does not write a finished assignment. No background scan, cron, calendar write, or Discord delivery exists.
-
-- **Status**: Initial draft. Plugin tests, Template validation, offline preview, inspection, and archive build are recorded. Live calendar calls, `family_schedule` visibility, Template Add, model conversation, and receiving-host permissions are unfinished. See [verification](docs/meals-tutor-verification.md) and Tutor's README for exact boundaries.
-
-## Repository Layout
-
-- `templates/hopper/`: Hopper's complete package source.
-- `templates/bernie/`: Bernie's complete package source.
-- `templates/meals/`: Meals' complete package source.
-- `templates/tutor/`: Tutor's complete package source.
-- `templates/starter-agent/`: Legacy starter scaffold (not an installable OpenClaw Template package).
-- `templates/<another-agent>/`: Future independent packages.
-- `docs/VERIFICATION.md`: Observed Hopper evidence and outstanding checks.
-- `docs/meals-tutor-verification.md`: Observed Meals and Tutor evidence and outstanding checks.
-- `AGENTS.md`: Portable template collection guidance.
-- `CONTRIBUTING.md`: Adding and changing packages.
-
-## Quick Start
-
-### 1. Clone the Repository
-
-```bash
-git clone https://github.com/DonnieFi/agent-templates.git
-cd agent-templates
+```sh
+openclaw templates add ./templates/hopper
 ```
 
-### 2. Validate a Template
+Use `./templates/bernie`, `./templates/meals`, or `./templates/tutor` for the other packages.
+A recorded Gateway Add is still outstanding. See [docs/VERIFICATION.md](docs/VERIFICATION.md) and [docs/meals-tutor-verification.md](docs/meals-tutor-verification.md).
 
-With a compatible OpenClaw CLI installed, run from this repository root:
+## Report a problem
 
-```bash
+Open a GitHub issue on [DonnieFi/agent-templates](https://github.com/DonnieFi/agent-templates/issues).
+Give the Template name, its version, your OpenClaw version (`openclaw --version`), and what happened.
+Do not paste tokens, keys, postal codes, or personal data.
+
+## Build or check a Template locally
+
+You need OpenClaw with the `templates` command.
+
+```sh
 openclaw templates validate ./templates/hopper
 openclaw templates dev ./templates/hopper
 openclaw templates inspect ./templates/hopper
-```
-
-Use `./templates/bernie`, `./templates/meals`, or `./templates/tutor` in those
-three commands to check the other packages. Build into an existing local output
-directory:
-
-```bash
 mkdir -p dist
 openclaw templates build ./templates/hopper --out ./dist/hopper-0.1.0.tgz
-openclaw templates build ./templates/bernie --out ./dist/bernie-0.1.0.tgz
-openclaw templates build ./templates/meals --out ./dist/meals-0.1.0.tgz
-openclaw templates build ./templates/tutor --out ./dist/tutor-0.1.0.tgz
 ```
 
-These checks do not create an agent or publish a package. Adding, connecting external services, enabling automations, and ClawHub publication are separate reviewed actions. Do not run installation or publishing commands as a test.
+`dev` checks what an Add would do without changing your OpenClaw.
+`build` refuses to overwrite an existing file.
+These commands do not create an agent or publish a package.
 
-## Sharing Templates
+Use `./templates/bernie`, `./templates/meals`, or `./templates/tutor` the same way.
+`build` writes `./dist/<name>-0.1.0.tgz`.
 
-Keep source changes reviewable here, publish an explicitly reviewed package to ClawHub, then share its link and useful examples in the [OpenClaw Templates Showcase](https://community.openclaw.ai/t/openclaw-templates-showcase/415). The showcase thread does not state a core-repository PR requirement.
+## Add a Template
 
-## Privacy & Boundaries
+1. Make a folder `templates/<name>/` with the package source at its root. `openclaw templates validate ./templates/<name>` must pass.
+2. Add a row to the table above. Leave ClawHub as `Not published` until a reviewed publish.
+3. Open a pull request. See [CONTRIBUTING.md](CONTRIBUTING.md).
 
-Keep personal locations, real household records, credentials, local provider installations, downloaded transit databases, and raw conversations out of this repository. Example data must be clearly fictional; public feed observations must be dated and not presented as current advice.
+## Privacy
+
+Keep personal locations, real household records, credentials, and raw conversations out of this repository.
+Example data must be fictional. Public feed observations must be dated.
 
 ## License
 
-This repository is licensed under the [MIT License](LICENSE).
+MIT. See [LICENSE](LICENSE).
