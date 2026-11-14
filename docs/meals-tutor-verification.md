@@ -211,7 +211,9 @@ What changed and passed:
   `templates/tutor/plugins/tutor/` (`diff -rq` matches each plugin `dist/` cleanly).
 - `openclaw templates validate`, offline `dev`, `inspect`, and `build` passed for
   `./templates/meals` and `./templates/tutor` (11 preview actions, 3 capability
-  escalations, 0 blocked actions, 0 excluded project paths each).
+  escalations, 0 blocked actions, 0 excluded project paths each), including updated
+  source/hash pins inside `templates/*/README.md` and
+  `templates/*/workspace/reference/setup.md`.
 - Isolated `openclaw templates add` (`OPENCLAW_STATE_DIR` / `OPENCLAW_CONFIG_PATH`
   under `/tmp`) committed agent configs (`status: "complete"`, `configCommitted: true`),
   and `openclaw plugins list --json` showed `meals-planner@0.1.0` (11 tools) and
@@ -220,9 +222,9 @@ What changed and passed:
 Template archive integrity, superseding the hashes above:
 
 - `dist/meals-0.1.0.tgz`:
-  `sha256:d3e31b91417a858c2ba5dd3affabf1336b490442fc1015a72f6ba59a070cbfcf`
+  `sha256:aea7815261ee1c76259de301e05b096aeff082f763a93405daeec59e88d250b7`
 - `dist/tutor-0.1.0.tgz`:
-  `sha256:344e75837c57ac9979c3a5332f7b534db3796a3bb8f14b688b6e45110240dc00`
+  `sha256:6f4954307d9f70117121036f68c9c2e37ef0f1d3b12b8246358a1cad978d71dd`
 
 Still unverified or skipped:
 

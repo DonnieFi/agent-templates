@@ -96,9 +96,9 @@ or establish calendar coverage. The README is also mapped into
 ## Source
 
 The plugin source is [DonnieFi/openclaw-tutor](https://github.com/DonnieFi/openclaw-tutor),
-at source commit `a1c7967de81296f51a4532cb53dccc90586f5ca9`. The template vendors
+at source commit `4f9c561b4685f52396a4056323b639d1e1bbe128`. The template vendors
 only the tested build: `openclaw-tutor-plugin@0.1.0`, artifact SHA-256
-`d389213e1e19abecd4c6ba5ae945f98078c7fc0bf3c2360d2346741e16cf4d26`.
+`250da7931131436cc94b21077b2e6f4ff93bc1d766f309ff873138e400e9e1e0`.
 
 No private student records, real syllabi, raw conversations, or machine-specific
 paths are included.

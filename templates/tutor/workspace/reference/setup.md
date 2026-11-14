@@ -9,9 +9,9 @@ scan.
 - Package: `openclaw-tutor-plugin@0.1.0`
 - Plugin ID: `tutor-study`
 - Artifact: `openclaw-tutor-plugin-0.1.0.tgz`
-- SHA-256: `d389213e1e19abecd4c6ba5ae945f98078c7fc0bf3c2360d2346741e16cf4d26`
+- SHA-256: `250da7931131436cc94b21077b2e6f4ff93bc1d766f309ff873138e400e9e1e0`
 - Source: https://github.com/DonnieFi/openclaw-tutor
-- Source commit: `a1c7967de81296f51a4532cb53dccc90586f5ca9`
+- Source commit: `4f9c561b4685f52396a4056323b639d1e1bbe128`
 - Staged path: `plugins/tutor/` with compiled `dist/`, `package.json`,
   `openclaw.plugin.json`, `README.md`, and `LICENSE`
 
@@ -97,6 +97,7 @@ Plugin proof is run in the source repository
 (https://github.com/DonnieFi/openclaw-tutor):
 
     npm install --ignore-scripts
+    npm run typecheck
     npm run build
     npm test
 
