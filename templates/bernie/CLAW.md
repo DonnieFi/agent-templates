@@ -22,6 +22,8 @@ workspace:
     AGENTS.md:
       source: workspace/AGENTS.md
   files:
+    - source: README.md
+      path: reference/package-readme.md
     - source: workspace/discord.md
       path: reference/discord.md
 ---

@@ -12,7 +12,7 @@ Reviewing or merging this source does not publish a registry package or install 
 | Template | Package | ClawHub | Folder |
 |----------|---------|---------|--------|
 | [Hopper](templates/hopper/README.md) | `hopper-transit-companion@0.1.0` | Not published | [`templates/hopper/`](templates/hopper/) |
-| [Bernie](templates/bernie/README.md) | `bernie-house-griffon@0.1.0` | Not published | [`templates/bernie/`](templates/bernie/) |
+| [Bernie](templates/bernie/README.md) | `bernie-house-griffon@0.1.1` | Not published | [`templates/bernie/`](templates/bernie/) |
 | [Meals](templates/meals/README.md) | `meals-week-planner@0.1.0` | Not published | [`templates/meals/`](templates/meals/) |
 | [Tutor](templates/tutor/README.md) | `tutor-study-companion@0.1.0` | Not published | [`templates/tutor/`](templates/tutor/) |
 
