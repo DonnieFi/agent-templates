@@ -11,7 +11,7 @@ scan.
 - Artifact: `openclaw-tutor-plugin-0.1.0.tgz`
 - SHA-256: `132160ed6e734eca5b5dbed4f04b37b6337adf57c4d75a87b17434d21cf11fb8`
 - Source: https://github.com/DonnieFi/openclaw-tutor
-- Source commit: `b09417fe6b73a6a855b2c7c5f048779ed321f509`
+- Source commit: `a39fa6ff4cca228b55effb4469d7afc4e56f495f`
 - Staged path: `plugins/tutor/` with compiled `dist/`, `package.json`,
   `openclaw.plugin.json`, `README.md`, and `LICENSE`
 

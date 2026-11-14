@@ -10,9 +10,9 @@ production-readiness declaration.
 - Template source: branch `feat/meals-tutor-v1`, based on the collection's
   `main` at the start of this work.
 - Plugin source: [DonnieFi/openclaw-meals](https://github.com/DonnieFi/openclaw-meals)
-  at `781e64b4a6289f2bc36e157c4be0b7f5924cef4c`, and
+  at `67ce23db4edce0af275deabe09e6248e438524ce`, and
   [DonnieFi/openclaw-tutor](https://github.com/DonnieFi/openclaw-tutor) at
-  `b09417fe6b73a6a855b2c7c5f048779ed321f509`. Both are public source
+  `a39fa6ff4cca228b55effb4469d7afc4e56f495f`. Both are public source
   repositories. No package-registry or ClawHub publication was performed.
 - No live flyer request, live calendar call, Template Add, model conversation,
   or scheduler change is part of this proof.
@@ -108,9 +108,9 @@ Observed:
 Template artifact integrity:
 
 - `dist/meals-0.1.0.tgz`:
-  `sha256:39b59dcc95db9f6cce0a3e2b7be744493d775d8556166c000fce8e7f44b355e4`
+  `sha256:a53b46e9dce71e243b0b6721c6f4d26de1a214a1145c80f407ede7ef9e213c40`
 - `dist/tutor-0.1.0.tgz`:
-  `sha256:7f3b408eacc3094d257f6fa27b930c09ac5f1245fbbf2c03297e78a991fdfc8e`
+  `sha256:2e7ef54b541e130883ec1f85b18f97e03885ba8603bcfb53850b5c67825f766a`
 
 ## Boundaries confirmed in the packages
 
