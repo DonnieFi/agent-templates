@@ -69,7 +69,7 @@ function normalizeState(value) {
     const markdown = asString(guide.markdown);
     if (!title.trim() || !subject.trim() || !isDate(date) || !markdown.trim()) return [];
     return [{
-      key: asString(guide.key, keyOf(title, date)),
+      key: asString(guide.key, keyOf(subject, title, date)),
       title,
       subject,
       date,
@@ -157,26 +157,41 @@ class TutorService {
     const map = /* @__PURE__ */ new Map();
     for (const assessment of state.assessments) {
       if (assessment.date < current || assessment.date > end) continue;
-      map.set(keyOf(assessment.title, assessment.date), {
+      map.set(keyOf(assessment.subject, assessment.title, assessment.date), {
         ...assessment,
         source: "tutor",
         sources: ["tutor"]
       });
     }
+    const mergeItem = (key, existing, item, source) => {
+      const sources = [.../* @__PURE__ */ new Set([...existing.sources, source])];
+      map.set(key, {
+        ...existing,
+        subject: existing.subject === "General" && item.subject ? item.subject : existing.subject,
+        time: existing.time ?? item.time ?? null,
+        source: existing.source === "calendar" ? "calendar" : "both",
+        sources
+      });
+    };
     for (const item of calendarItems) {
       if (item.date < current || item.date > end) continue;
-      const key = keyOf(item.title, item.date);
       const source = item.source ?? "calendar";
-      const existing = map.get(key);
-      if (existing) {
-        const sources = [.../* @__PURE__ */ new Set([...existing.sources, source])];
-        map.set(key, {
-          ...existing,
-          subject: existing.subject === "General" && item.subject ? item.subject : existing.subject,
-          time: existing.time ?? item.time ?? null,
-          source: existing.source === "calendar" ? "calendar" : "both",
-          sources
-        });
+      const exact = item.subject === void 0 ? void 0 : keyOf(item.subject, item.title, item.date);
+      const existing = exact === void 0 ? void 0 : map.get(exact);
+      if (exact !== void 0 && existing) {
+        mergeItem(exact, existing, item, source);
+        continue;
+      }
+      const sameTitleDate = item.subject === void 0 ? [...map.entries()].filter(([, value]) => keyOf(value.title, value.date) === keyOf(item.title, item.date)) : [];
+      if (sameTitleDate.length === 1) {
+        const [key2, value] = sameTitleDate[0];
+        mergeItem(key2, value, item, source);
+        continue;
+      }
+      const key = keyOf(item.subject ?? "General", item.title, item.date);
+      const duplicate = map.get(key);
+      if (duplicate) {
+        mergeItem(key, duplicate, item, source);
         continue;
       }
       map.set(key, {
@@ -398,7 +413,7 @@ ${note}`);
       `_Built from saved notes on ${today(this.now())}. It is a starting point, not an answer key._`
     ].join("\n");
     return {
-      key: keyOf(assessment.title, assessment.date),
+      key: keyOf(assessment.subject, assessment.title, assessment.date),
       title: assessment.title,
       subject: assessment.subject,
       date: assessment.date,
@@ -415,7 +430,7 @@ ${note}`);
     const before = state.guides.length;
     state.guides = state.guides.filter((guide) => guide.date >= merged.current).slice(-MAX_GUIDES);
     const guides = due.map((assessment) => {
-      const key = keyOf(assessment.title, assessment.date);
+      const key = keyOf(assessment.subject, assessment.title, assessment.date);
       const existing = state.guides.find((guide) => guide.key === key && guide.date === assessment.date);
       if (existing) return { ...existing, reused: true };
       const built = this.buildGuide(state, assessment);

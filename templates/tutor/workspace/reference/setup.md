@@ -9,7 +9,7 @@ scan.
 - Package: `openclaw-tutor-plugin@0.1.0`
 - Plugin ID: `tutor`
 - Artifact: `openclaw-tutor-plugin-0.1.0.tgz`
-- SHA-256: `e907e41311f2e72a0fdbce3da79d029b0d6bc8fa861f823443b1efd77001daa2`
+- SHA-256: `132160ed6e734eca5b5dbed4f04b37b6337adf57c4d75a87b17434d21cf11fb8`
 - Source: the sibling `openclaw-tutor` plugin repository
 - Staged path: `plugins/tutor/` with compiled `dist/`, `package.json`,
   `openclaw.plugin.json`, `README.md`, and `LICENSE`

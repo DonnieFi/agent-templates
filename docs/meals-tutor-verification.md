@@ -54,13 +54,15 @@ Artifact SHA-256:
     npm run build
     npm test
 
-Observed: 9 tests passed, 0 failed. Cover:
+Observed: 10 tests passed, 0 failed. Cover:
 
 - calendar setup and the one-time missing-calendar reminder;
 - topic upsert, agent scope, every-word search, previews, and input validation;
 - hand-entered assessment replace-by-subject-and-title;
 - calendar-item merge, `both` source, duplicate collapse, range filtering, and
   bad-date rejection;
+- same-title, same-date assessments in different subjects staying separate,
+  with a subject match merging and an ambiguous calendar item adding its own;
 - a due guide built from saved notes, stored, and returned unchanged;
 - calendar-only due guides and an empty-topic guide;
 - no guide outside the two-day window;
@@ -69,7 +71,7 @@ Observed: 9 tests passed, 0 failed. Cover:
 
 Plugin package: `openclaw-tutor-plugin@0.1.0`.
 Artifact SHA-256:
-`e907e41311f2e72a0fdbce3da79d029b0d6bc8fa861f823443b1efd77001daa2`.
+`132160ed6e734eca5b5dbed4f04b37b6337adf57c4d75a87b17434d21cf11fb8`.
 
 ## Template checks
 
@@ -103,7 +105,7 @@ Template artifact integrity:
 - `dist/meals-0.1.0.tgz`:
   `sha256:e86c75be7becadf659bcaf33b5b100da0a3a9e490c4af79ea5d15fbbcdf05d5e`
 - `dist/tutor-0.1.0.tgz`:
-  `sha256:157b42d0db5b79df4a5ac83bcfa3f97b339af0c4de9cd49ce9590eaaa08e0966`
+  `sha256:a96035f5d7fadfd8bb9a9951c12d02c131d67fac8b08041c45bbf57d193d7b39`
 
 ## Boundaries confirmed in the packages
 
