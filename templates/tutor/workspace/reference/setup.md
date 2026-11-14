@@ -10,7 +10,8 @@ scan.
 - Plugin ID: `tutor`
 - Artifact: `openclaw-tutor-plugin-0.1.0.tgz`
 - SHA-256: `132160ed6e734eca5b5dbed4f04b37b6337adf57c4d75a87b17434d21cf11fb8`
-- Source: the sibling `openclaw-tutor` plugin repository
+- Source: https://github.com/DonnieFi/openclaw-tutor
+- Source commit: `b09417fe6b73a6a855b2c7c5f048779ed321f509`
 - Staged path: `plugins/tutor/` with compiled `dist/`, `package.json`,
   `openclaw.plugin.json`, `README.md`, and `LICENSE`
 
@@ -86,7 +87,8 @@ From the source repository root:
     openclaw templates inspect ./templates/tutor
     openclaw templates build ./templates/tutor --out ./dist/tutor-0.1.0.tgz
 
-Plugin proof is run in the sibling source repository:
+Plugin proof is run in the source repository
+(https://github.com/DonnieFi/openclaw-tutor):
 
     npm install --ignore-scripts
     npm run build

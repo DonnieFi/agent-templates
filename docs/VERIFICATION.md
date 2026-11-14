@@ -158,8 +158,8 @@ Observed 2026-11-14 with OpenClaw 2026.11.3 (17db247).
 
 ## Meals and Tutor v1 — 2026-11-14
 
-- Added two independently buildable packages with sibling plugin sources, pinned builds, skills, setup notes, fictional examples, and acceptance plans.
+- Added two independently buildable packages with public plugin source repositories, pinned builds, skills, setup notes, fictional examples, and acceptance plans.
 - Plugin tests passed: Meals 11/11, Tutor 10/10, using fake keyed stores, clocks, and fictional flyer and calendar fixtures. No network or host state was touched.
 - `openclaw templates validate`, offline `dev`, `inspect`, and `build` passed for both packages. Each reports one agent, one skill, one bundled plugin, zero MCP servers, zero automations, and zero blocked preview actions.
-- Meals archive SHA-256: `180b908f711f5e96d8f10cf34b360c58bd9f67d3b83ded716bee58de3e92c196`. Tutor archive SHA-256: `54083b17dbc2d2dc888d72c66a62034afebd9dad6e5213b5a24d195bab776bb1`.
-- No live flyer request, live calendar call, Template Add, model conversation, Family Pack install, or publication is part of this proof. See [meals-tutor-verification.md](meals-tutor-verification.md) for the detailed boundary list.
+- Meals archive SHA-256: `39b59dcc95db9f6cce0a3e2b7be744493d775d8556166c000fce8e7f44b355e4`. Tutor archive SHA-256: `7f3b408eacc3094d257f6fa27b930c09ac5f1245fbbf2c03297e78a991fdfc8e`.
+- No live flyer request, live calendar call, Template Add, model conversation, Family Pack install, or package-registry/ClawHub publication is part of this proof. See [meals-tutor-verification.md](meals-tutor-verification.md) for the detailed boundary list.

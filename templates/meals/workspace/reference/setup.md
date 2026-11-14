@@ -10,7 +10,8 @@ job.
 - Plugin ID: `meals`
 - Artifact: `openclaw-meals-plugin-0.1.0.tgz`
 - SHA-256: `7a6c27a84afdc1d418c1197c48e3a907d7654832d42c202225ca923de28f4fa6`
-- Source: the sibling `openclaw-meals` plugin repository
+- Source: https://github.com/DonnieFi/openclaw-meals
+- Source commit: `781e64b4a6289f2bc36e157c4be0b7f5924cef4c`
 - Staged path: `plugins/meals/` with compiled `dist/`, `package.json`,
   `openclaw.plugin.json`, `README.md`, and `LICENSE`
 
@@ -98,7 +99,8 @@ From the source repository root:
     openclaw templates inspect ./templates/meals
     openclaw templates build ./templates/meals --out ./dist/meals-0.1.0.tgz
 
-Plugin proof is run in the sibling source repository:
+Plugin proof is run in the source repository
+(https://github.com/DonnieFi/openclaw-meals):
 
     npm install --ignore-scripts
     npm run build

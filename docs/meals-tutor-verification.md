@@ -9,9 +9,11 @@ production-readiness declaration.
 - Node used for plugin tests: `26.13.0`.
 - Template source: branch `feat/meals-tutor-v1`, based on the collection's
   `main` at the start of this work.
-- Plugin source: sibling `openclaw-meals` and `openclaw-tutor` repositories,
-  created locally for this v1. Both plugin commits are local; no remote or
-  registry publication was performed.
+- Plugin source: [DonnieFi/openclaw-meals](https://github.com/DonnieFi/openclaw-meals)
+  at `781e64b4a6289f2bc36e157c4be0b7f5924cef4c`, and
+  [DonnieFi/openclaw-tutor](https://github.com/DonnieFi/openclaw-tutor) at
+  `b09417fe6b73a6a855b2c7c5f048779ed321f509`. Both are public source
+  repositories. No package-registry or ClawHub publication was performed.
 - No live flyer request, live calendar call, Template Add, model conversation,
   or scheduler change is part of this proof.
 
@@ -46,6 +48,7 @@ Observed: 11 tests passed, 0 failed. Cover:
 - corrupt stored state reading as empty.
 
 Plugin package: `openclaw-meals-plugin@0.1.0`.
+Source: https://github.com/DonnieFi/openclaw-meals
 Artifact SHA-256:
 `7a6c27a84afdc1d418c1197c48e3a907d7654832d42c202225ca923de28f4fa6`.
 
@@ -71,6 +74,7 @@ Observed: 10 tests passed, 0 failed. Cover:
 - title-word topic matching when the subject differs.
 
 Plugin package: `openclaw-tutor-plugin@0.1.0`.
+Source: https://github.com/DonnieFi/openclaw-tutor
 Artifact SHA-256:
 `132160ed6e734eca5b5dbed4f04b37b6337adf57c4d75a87b17434d21cf11fb8`.
 
@@ -104,9 +108,9 @@ Observed:
 Template artifact integrity:
 
 - `dist/meals-0.1.0.tgz`:
-  `sha256:180b908f711f5e96d8f10cf34b360c58bd9f67d3b83ded716bee58de3e92c196`
+  `sha256:39b59dcc95db9f6cce0a3e2b7be744493d775d8556166c000fce8e7f44b355e4`
 - `dist/tutor-0.1.0.tgz`:
-  `sha256:54083b17dbc2d2dc888d72c66a62034afebd9dad6e5213b5a24d195bab776bb1`
+  `sha256:7f3b408eacc3094d257f6fa27b930c09ac5f1245fbbf2c03297e78a991fdfc8e`
 
 ## Boundaries confirmed in the packages
 

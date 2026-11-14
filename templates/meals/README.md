@@ -80,7 +80,8 @@ or establish provider coverage. The README is also mapped into
 
 ## Source
 
-The plugin source is the sibling `openclaw-meals` repository. The template vendors
+The plugin source is [DonnieFi/openclaw-meals](https://github.com/DonnieFi/openclaw-meals),
+at source commit `781e64b4a6289f2bc36e157c4be0b7f5924cef4c`. The template vendors
 only the tested build: `openclaw-meals-plugin@0.1.0`, artifact SHA-256
 `7a6c27a84afdc1d418c1197c48e3a907d7654832d42c202225ca923de28f4fa6`.
 
