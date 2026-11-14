@@ -2,7 +2,7 @@
 
 Portable OpenClaw agents built around useful everyday jobs.
 
-Packages under `templates/` represent agent templates for OpenClaw. In this collection, [Hopper](templates/hopper/) and [Bernie](templates/bernie/) are current-format, independently versioned OpenClaw Template packages; [starter-agent](templates/starter-agent/) is a legacy scaffold (retaining `agent.json` and `prompts/system.md` rather than an installable OpenClaw `CLAW.md`/`package.json` manifest). This source repository is separate from ClawHub publication: reviewing or merging source does not publish a registry package or install an agent.
+Packages under `templates/` represent agent templates for OpenClaw. In this collection, [Hopper](templates/hopper/), [Bernie](templates/bernie/), [Meals](templates/meals/), and [Tutor](templates/tutor/) are current-format, independently versioned OpenClaw Template packages; [starter-agent](templates/starter-agent/) is a legacy scaffold (retaining `agent.json` and `prompts/system.md` rather than an installable OpenClaw `CLAW.md`/`package.json` manifest). This source repository is separate from ClawHub publication: reviewing or merging source does not publish a registry package or install an agent.
 
 ## Available Templates
 
@@ -10,7 +10,10 @@ Packages under `templates/` represent agent templates for OpenClaw. In this coll
 | :--- | :--- | :--- |
 | [**Hopper**](templates/hopper/) | Catch the right ride: conversational transit companion with stop/direction-aware departures, walking buffers, and live vs. scheduled status | Draft / Pilot |
 | [**Bernie**](templates/bernie/) | Household companion: practical help from what people share, plus consent-based local profiles for family and pets | Draft |
+| [**Meals**](templates/meals/) | Plan a week of dinners, keep an agent-scoped grocery list, and check optional flyer deals | Draft |
+| [**Tutor**](templates/tutor/) | Keep topic notes and assessment dates, use a visible calendar, and build a two-day study guide on demand | Draft |
 | [**Starter Agent**](templates/starter-agent/) | Minimal scaffold for building custom autonomous agents | Legacy scaffold—not installable |
+
 
 ### Hopper — Catch the right ride
 
@@ -24,13 +27,28 @@ Packages under `templates/` represent agent templates for OpenClaw. In this coll
 
 - **Status**: Initial draft. Package validation, offline preview, inspection, and archive build are recorded. Model conversation, Template Add, live Discord identity and reply tests, and receiving-host permissions are unfinished. See [verification](docs/VERIFICATION.md) and Bernie's README for exact boundaries.
 
+### Meals — plan the week
+
+[Meals](templates/meals/) keeps an agent-scoped meal plan, grocery list, and one pending week suggestion. Flyer search is optional: setup asks for a postal code and stores, both skippable, and there is no default for either. A one-item search and an on-demand watch cover the saved list and planned ingredients. Nothing is posted to a channel, and no background sale watch exists.
+
+- **Status**: Initial draft. Plugin tests, Template validation, offline preview, inspection, and archive build are recorded. Live flyer calls, Template Add, model conversation, receiving-host permissions, and provider coverage are unfinished. See [verification](docs/meals-tutor-verification.md) and Meals' README for exact boundaries.
+
+### Tutor — study two days ahead
+
+[Tutor](templates/tutor/) keeps topic notes and assessment dates, uses a visible calendar when one is present, and builds a stored study guide when someone talks to it inside the two-day window. It teaches and helps search notes; it does not write a finished assignment. No background scan, cron, calendar write, or Discord delivery exists.
+
+- **Status**: Initial draft. Plugin tests, Template validation, offline preview, inspection, and archive build are recorded. Live calendar calls, `family_schedule` visibility, Template Add, model conversation, and receiving-host permissions are unfinished. See [verification](docs/meals-tutor-verification.md) and Tutor's README for exact boundaries.
+
 ## Repository Layout
 
 - `templates/hopper/`: Hopper's complete package source.
 - `templates/bernie/`: Bernie's complete package source.
+- `templates/meals/`: Meals' complete package source.
+- `templates/tutor/`: Tutor's complete package source.
 - `templates/starter-agent/`: Legacy starter scaffold (not an installable OpenClaw Template package).
 - `templates/<another-agent>/`: Future independent packages.
-- `docs/VERIFICATION.md`: Observed evidence and outstanding checks.
+- `docs/VERIFICATION.md`: Observed Hopper evidence and outstanding checks.
+- `docs/meals-tutor-verification.md`: Observed Meals and Tutor evidence and outstanding checks.
 - `AGENTS.md`: Portable template collection guidance.
 - `CONTRIBUTING.md`: Adding and changing packages.
 
@@ -53,12 +71,16 @@ openclaw templates dev ./templates/hopper
 openclaw templates inspect ./templates/hopper
 ```
 
-Use `./templates/bernie` in those three commands to check Bernie. Build into an existing local output directory:
+Use `./templates/bernie`, `./templates/meals`, or `./templates/tutor` in those
+three commands to check the other packages. Build into an existing local output
+directory:
 
 ```bash
 mkdir -p dist
 openclaw templates build ./templates/hopper --out ./dist/hopper-0.1.0.tgz
 openclaw templates build ./templates/bernie --out ./dist/bernie-0.1.0.tgz
+openclaw templates build ./templates/meals --out ./dist/meals-0.1.0.tgz
+openclaw templates build ./templates/tutor --out ./dist/tutor-0.1.0.tgz
 ```
 
 These checks do not create an agent or publish a package. Adding, connecting external services, enabling automations, and ClawHub publication are separate reviewed actions. Do not run installation or publishing commands as a test.
