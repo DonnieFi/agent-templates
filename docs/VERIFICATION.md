@@ -138,3 +138,11 @@ Observed 2026-11-14 with OpenClaw 2026.11.3 (17db247).
 - No catalog/registry publication, installation, live messaging, or merge is authorized or performed by this verification.
 
 - `openclaw templates build templates/bernie --out dist/bernie-0.1.0.tgz`: passed; archive contains only CLAW.md, package.json, workspace/AGENTS.md, and workspace/discord.md. SHA-256: `3ddc5cbacac5eb9d2704d2cc9a8c5e151698791c4e12853dfce8c4308d6057aa`.
+
+## Bernie family-centric revision — 2026-11-14
+
+- Added consent-based, separate local Markdown profiles for people and pets, with minimal agreed facts, relevant-profile reading, corrections/removal, and explicit shared-workspace privacy limits.
+- Made the base agent conversation/local-notes only: no Home Assistant or unavailable integration calls; connected family features belong to separately configured Family Pack.
+- Re-ran validate, offline dev preview, inspect, build, and diff checks successfully. Preview still reports five planned actions, one capability escalation, zero blockers; zero skills/plugins/MCP servers/automations.
+- Updated archive SHA-256: `29664819b7d635105e04859a73dc4626b4c5c5ddd7d952462ebc16859533a4f2` (supersedes the earlier artifact hash).
+- Profile files are created at runtime after consent, not bundled. Real model personalization, profile creation, and Family Pack integration remain untested. No live installation or connection was performed.
