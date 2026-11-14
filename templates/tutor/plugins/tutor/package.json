@@ -27,10 +27,12 @@
   "devDependencies": {
     "@types/node": "24.10.1",
     "esbuild": "0.28.2",
+    "openclaw": "2026.11.3",
     "typescript": "5.9.3"
   },
   "scripts": {
     "build": "esbuild src/*.ts --platform=node --format=esm --outdir=dist --packages=external",
+    "typecheck": "tsc -p tsconfig.json",
     "test": "npm run build && node --test test/*.test.mjs"
   },
   "openclaw": {

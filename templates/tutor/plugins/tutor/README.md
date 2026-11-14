@@ -59,6 +59,7 @@ names the study steps; it is not an answer key or a finished assignment.
 With Node 24.22.1 or newer:
 
     npm install --ignore-scripts
+    npm run typecheck
     npm run build
     npm test
 

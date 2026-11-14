@@ -47,6 +47,7 @@ logged-in account.
 With Node 24.22.1 or newer:
 
     npm install --ignore-scripts
+    npm run typecheck
     npm run build
     npm test
 

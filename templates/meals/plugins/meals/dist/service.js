@@ -18,6 +18,7 @@ const MAX_SUGGESTION_DAYS = 14;
 const WATCH_ITEMS = 12;
 const WATCH_CONCURRENCY = 4;
 const WATCH_DEALS_PER_ITEM = 5;
+const MAX_COMMIT_ATTEMPTS = 8;
 const MAX_FETCH_BYTES = 2 * 1024 * 1024;
 const SOURCE = "Flipp public flyer search";
 function emptyState() {
@@ -154,14 +155,31 @@ class MealsService {
     return `agent:${scope.agentId}`;
   }
   async load(scope) {
-    const state = normalizeState(await this.store.lookup(this.key(scope)));
     scope.assertCurrent();
-    return state;
+    const observed = await this.store.observe(this.key(scope));
+    scope.assertCurrent();
+    return normalizeState(observed.value);
   }
-  async save(state, scope) {
+  async mutateState(scope, apply) {
     scope.assertCurrent();
-    await this.store.register(this.key(scope), state, { assertCurrent: scope.assertCurrent });
+    const key = this.key(scope);
+    let current = await this.store.observe(key);
     scope.assertCurrent();
+    for (let attempt = 0; attempt < MAX_COMMIT_ATTEMPTS; attempt += 1) {
+      const state = normalizeState(current.value);
+      const outcome = apply(state);
+      scope.assertCurrent();
+      if (!outcome.changed) return outcome.result;
+      const applied = await this.store.compareAndApply(key, current.comparison, {
+        operation: "update",
+        action: "set",
+        value: state
+      });
+      scope.assertCurrent();
+      if (applied.status !== "conflict") return outcome.result;
+      current = applied.current;
+    }
+    throw new Error("Could not save meals changes after concurrent updates. Please try again.");
   }
   async findDeals(item, state, limit, scope) {
     const postalCode = state.setup.postalCode;
@@ -201,29 +219,29 @@ class MealsService {
       notes: input.notes,
       ingredients: input.ingredients
     });
-    const state = await this.load(scope);
     const key = normalizeName(`${clean.day}|${clean.meal}`);
-    const index = state.meals.findIndex((meal) => normalizeName(`${meal.day}|${meal.meal}`) === key);
-    const saved = { ...clean, updatedAt: new Date(this.now()).toISOString() };
-    if (index === -1) {
-      if (state.meals.length >= MAX_MEALS) throw new Error(`The meal plan already has ${MAX_MEALS} meals. Delete one first.`);
-      state.meals.push(saved);
-    } else {
-      state.meals[index] = saved;
-    }
-    await this.save(state, scope);
-    return { saved: true, meal: saved, mealCount: state.meals.length };
+    return this.mutateState(scope, (state) => {
+      const index = state.meals.findIndex((meal) => normalizeName(`${meal.day}|${meal.meal}`) === key);
+      const saved = { ...clean, updatedAt: new Date(this.now()).toISOString() };
+      if (index === -1) {
+        if (state.meals.length >= MAX_MEALS) throw new Error(`The meal plan already has ${MAX_MEALS} meals. Delete one first.`);
+        state.meals.push(saved);
+      } else {
+        state.meals[index] = saved;
+      }
+      return { changed: true, result: { saved: true, meal: saved, mealCount: state.meals.length } };
+    });
   }
   async deleteMeal(input, scope) {
     if (!isDate(input.day)) throw new Error("day must be a real date in YYYY-MM-DD form.");
     const meal = cleanText(input.meal, "meal", 40);
-    const state = await this.load(scope);
     const key = normalizeName(`${input.day}|${meal}`);
-    const index = state.meals.findIndex((item) => normalizeName(`${item.day}|${item.meal}`) === key);
-    if (index === -1) return { removed: false, note: "No saved meal matched that date and meal." };
-    const [removed] = state.meals.splice(index, 1);
-    await this.save(state, scope);
-    return { removed: true, meal: removed, mealCount: state.meals.length };
+    return this.mutateState(scope, (state) => {
+      const index = state.meals.findIndex((item) => normalizeName(`${item.day}|${item.meal}`) === key);
+      if (index === -1) return { changed: false, result: { removed: false, note: "No saved meal matched that date and meal." } };
+      const [removed] = state.meals.splice(index, 1);
+      return { changed: true, result: { removed: true, meal: removed, mealCount: state.meals.length } };
+    });
   }
   async getGrocery(scope) {
     const state = await this.load(scope);
@@ -231,42 +249,43 @@ class MealsService {
   }
   async addGrocery(input, scope) {
     const name = cleanText(input.name, "name", 80);
-    const state = await this.load(scope);
+    const quantity = input.quantity === void 0 ? void 0 : optionalText(input.quantity, 80);
+    const notes = input.notes === void 0 ? void 0 : optionalText(input.notes, 500);
     const key = normalizeName(name);
-    const index = state.grocery.findIndex((item2) => normalizeName(item2.name) === key);
-    const updatedAt = new Date(this.now()).toISOString();
-    if (index === -1) {
-      if (state.grocery.length >= MAX_GROCERY) throw new Error(`The grocery list already has ${MAX_GROCERY} items. Remove one first.`);
-      const item2 = {
+    return this.mutateState(scope, (state) => {
+      const index = state.grocery.findIndex((item2) => normalizeName(item2.name) === key);
+      const updatedAt = new Date(this.now()).toISOString();
+      if (index === -1) {
+        if (state.grocery.length >= MAX_GROCERY) throw new Error(`The grocery list already has ${MAX_GROCERY} items. Remove one first.`);
+        const item2 = {
+          name,
+          quantity: quantity ?? null,
+          notes: notes ?? null,
+          updatedAt
+        };
+        state.grocery.push(item2);
+        return { changed: true, result: { saved: true, item: item2, count: state.grocery.length } };
+      }
+      const existing = state.grocery[index];
+      const item = {
         name,
-        quantity: optionalText(input.quantity, 80),
-        notes: optionalText(input.notes, 500),
+        quantity: quantity === void 0 ? existing.quantity : quantity,
+        notes: notes === void 0 ? existing.notes : notes,
         updatedAt
       };
-      state.grocery.push(item2);
-      await this.save(state, scope);
-      return { saved: true, item: item2, count: state.grocery.length };
-    }
-    const existing = state.grocery[index];
-    const item = {
-      name,
-      quantity: input.quantity === void 0 ? existing.quantity : optionalText(input.quantity, 80),
-      notes: input.notes === void 0 ? existing.notes : optionalText(input.notes, 500),
-      updatedAt
-    };
-    state.grocery[index] = item;
-    await this.save(state, scope);
-    return { saved: true, item, count: state.grocery.length, replaced: true };
+      state.grocery[index] = item;
+      return { changed: true, result: { saved: true, item, count: state.grocery.length, replaced: true } };
+    });
   }
   async removeGrocery(input, scope) {
     const name = cleanText(input.name, "name", 80);
-    const state = await this.load(scope);
     const key = normalizeName(name);
-    const index = state.grocery.findIndex((item) => normalizeName(item.name) === key);
-    if (index === -1) return { removed: false, note: "No grocery item matched that name." };
-    const [removed] = state.grocery.splice(index, 1);
-    await this.save(state, scope);
-    return { removed: true, item: removed, count: state.grocery.length };
+    return this.mutateState(scope, (state) => {
+      const index = state.grocery.findIndex((item) => normalizeName(item.name) === key);
+      if (index === -1) return { changed: false, result: { removed: false, note: "No grocery item matched that name." } };
+      const [removed] = state.grocery.splice(index, 1);
+      return { changed: true, result: { removed: true, item: removed, count: state.grocery.length } };
+    });
   }
   async saveWeekSuggestion(input, scope) {
     if (!Array.isArray(input.days) || input.days.length === 0) throw new Error("A week suggestion needs at least one day.");
@@ -276,38 +295,41 @@ class MealsService {
     const days = [...byKey.values()].sort(
       (a, b) => a.day.localeCompare(b.day) || mealRank(a.meal) - mealRank(b.meal)
     );
-    const state = await this.load(scope);
-    const suggestion = {
-      days,
-      summary: optionalText(input.summary, 1e3),
-      createdAt: new Date(this.now()).toISOString()
-    };
-    const replaced = Boolean(state.suggestion);
-    state.suggestion = suggestion;
-    await this.save(state, scope);
-    return { saved: true, suggestion, replacedPrevious: replaced };
+    const summary = optionalText(input.summary, 1e3);
+    return this.mutateState(scope, (state) => {
+      const suggestion = {
+        days,
+        summary,
+        createdAt: new Date(this.now()).toISOString()
+      };
+      const replaced = Boolean(state.suggestion);
+      state.suggestion = suggestion;
+      return { changed: true, result: { saved: true, suggestion, replacedPrevious: replaced } };
+    });
   }
   async getSetup(scope) {
     const state = await this.load(scope);
     return setupSummary(state.setup);
   }
   async saveSetup(input, scope) {
-    const state = await this.load(scope);
-    if (input.postalCode !== void 0) {
-      state.setup.postalCode = input.postalCode === null ? null : normalizePostal(input.postalCode);
-    }
-    if (input.stores !== void 0) state.setup.stores = uniqueStrings(input.stores, 12, 60);
+    const postalCode = input.postalCode === void 0 ? void 0 : input.postalCode === null ? null : normalizePostal(input.postalCode);
+    const stores = input.stores === void 0 ? void 0 : uniqueStrings(input.stores, 12, 60);
+    let timezone;
     if (input.timezone !== void 0) {
-      if (input.timezone === null || input.timezone.trim() === "") state.setup.timezone = null;
+      if (input.timezone === null || input.timezone.trim() === "") timezone = null;
       else {
         const zone = input.timezone.trim();
         if (!isTimeZone(zone)) throw new Error("timezone must be an IANA name such as America/Halifax, or null to use the gateway host clock.");
-        state.setup.timezone = zone;
+        timezone = zone;
       }
     }
-    state.setup.updatedAt = new Date(this.now()).toISOString();
-    await this.save(state, scope);
-    return setupSummary(state.setup);
+    return this.mutateState(scope, (state) => {
+      if (postalCode !== void 0) state.setup.postalCode = postalCode;
+      if (stores !== void 0) state.setup.stores = stores;
+      if (timezone !== void 0) state.setup.timezone = timezone;
+      state.setup.updatedAt = new Date(this.now()).toISOString();
+      return { changed: true, result: setupSummary(state.setup) };
+    });
   }
   async searchFlyerDeals(input, scope) {
     const item = cleanText(input.item, "item", 80);
@@ -379,6 +401,7 @@ class MealsService {
   }
 }
 export {
+  MAX_COMMIT_ATTEMPTS,
   MAX_GROCERY,
   MAX_MEALS,
   MAX_SUGGESTION_DAYS,

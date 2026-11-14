@@ -180,3 +180,53 @@ Agent ids stay `meals` and `tutor`. Study-guide reuse until the assessment date
 passes is unchanged. No cron, Spoonacular, Discord delivery, or Family Pack
 `requiresPlugins` entry was added. No live flyer request, live calendar call,
 Template Add, or model conversation was run.
+
+## Keyed v2 concurrency fix and real SDK pass — 2026-11-14
+
+Supersedes the plugin source pins, plugin artifact hashes, and template archive
+hashes above.
+
+Plugin source:
+
+- [DonnieFi/openclaw-meals](https://github.com/DonnieFi/openclaw-meals) at
+  `9db4684bea0bc5cae0a17fa8038e0fb7095e4e79`. Plugin id `meals-planner`.
+  Package `openclaw-meals-plugin@0.1.0`. Artifact SHA-256
+  `dc23a28ddcf146bf5cd53d201531fe0361add1b99fcff860a79d41b8fb76ec18`.
+- [DonnieFi/openclaw-tutor](https://github.com/DonnieFi/openclaw-tutor) at
+  `4f9c561b4685f52396a4056323b639d1e1bbe128`. Plugin id `tutor-study`.
+  Package `openclaw-tutor-plugin@0.1.0`. Artifact SHA-256
+  `250da7931131436cc94b21077b2e6f4ff93bc1d766f309ff873138e400e9e1e0`.
+
+What changed and passed:
+
+- Switched state persistence in both plugins to the host v2 keyed store
+  (`observe` / `compareAndApply` with bounded conflict retry `MAX_COMMIT_ATTEMPTS = 8`
+  and per-execution `openKeyedStoreV2(..., { assertCurrent: context.assertInvocationCurrent })`).
+- Added `openclaw@2026.11.3` to `devDependencies` and `npm run typecheck`
+  (`tsc -p tsconfig.json`) against the real SDK declarations (0 errors in each repo).
+- `npm test` in each plugin repository: Meals 14/14, Tutor 14/14, including
+  interleaved same-agent write preservation, conflict retry bounds, and mid-flight
+  invocation revocation using a fake v2 keyed store.
+- Re-vendored compiled output into `templates/meals/plugins/meals/` and
+  `templates/tutor/plugins/tutor/` (`diff -rq` matches each plugin `dist/` cleanly).
+- `openclaw templates validate`, offline `dev`, `inspect`, and `build` passed for
+  `./templates/meals` and `./templates/tutor` (11 preview actions, 3 capability
+  escalations, 0 blocked actions, 0 excluded project paths each).
+- Isolated `openclaw templates add` (`OPENCLAW_STATE_DIR` / `OPENCLAW_CONFIG_PATH`
+  under `/tmp`) committed agent configs (`status: "complete"`, `configCommitted: true`),
+  and `openclaw plugins list --json` showed `meals-planner@0.1.0` (11 tools) and
+  `tutor-study@0.1.0` (10 tools) with `status: "loaded"` and `typebox@1.4.3` resolved.
+
+Template archive integrity, superseding the hashes above:
+
+- `dist/meals-0.1.0.tgz`:
+  `sha256:d3e31b91417a858c2ba5dd3affabf1336b490442fc1015a72f6ba59a070cbfcf`
+- `dist/tutor-0.1.0.tgz`:
+  `sha256:344e75837c57ac9979c3a5332f7b534db3796a3bb8f14b688b6e45110240dc00`
+
+Still unverified or skipped:
+
+- Ephemeral Gateway multi-turn model conversations and runtime tool / cross-agent
+  store isolation checks were skipped.
+- Live flyer HTTP queries, live `family_schedule` reads, Family Pack installed
+  alongside either template, and npm / ClawHub publication remain unverified.

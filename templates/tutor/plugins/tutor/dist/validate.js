@@ -67,7 +67,9 @@ function resolveCalendarDate(value, todayIso) {
   const match = /^(?:(\d{1,2})\s+([A-Za-z]+)|([A-Za-z]+)\s+(\d{1,2}))(?:,?\s+(\d{4}))?$/.exec(withoutWeekday);
   if (!match) return null;
   const day = Number(match[1] ?? match[4]);
-  const month = MONTHS[(match[2] ?? match[3]).toLowerCase()];
+  const monthToken = match[2] ?? match[3];
+  if (!monthToken) return null;
+  const month = MONTHS[monthToken.toLowerCase()];
   if (!month || day < 1 || day > 31) return null;
   const explicitYear = match[5] ? Number(match[5]) : null;
   const baseYear = Number(todayIso.slice(0, 4));

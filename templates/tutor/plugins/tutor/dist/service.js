@@ -18,6 +18,7 @@ const MAX_ASSESSMENTS = 100;
 const MAX_GUIDES = 50;
 const MAX_CALENDAR_ITEMS = 40;
 const DUE_DAYS = 2;
+const MAX_COMMIT_ATTEMPTS = 8;
 const MAX_GUIDE_TOPICS = 5;
 const MAX_GUIDE_NOTE_CHARS = 12e3;
 const MAX_SEARCH_NOTE_CHARS = 3e3;
@@ -163,14 +164,31 @@ class TutorService {
     return `agent:${scope.agentId}`;
   }
   async load(scope) {
-    const state = normalizeState(await this.store.lookup(this.key(scope)));
     scope.assertCurrent();
-    return state;
+    const observed = await this.store.observe(this.key(scope));
+    scope.assertCurrent();
+    return normalizeState(observed.value);
   }
-  async save(state, scope) {
+  async mutateState(scope, apply) {
     scope.assertCurrent();
-    await this.store.register(this.key(scope), state, { assertCurrent: scope.assertCurrent });
+    const key = this.key(scope);
+    let current = await this.store.observe(key);
     scope.assertCurrent();
+    for (let attempt = 0; attempt < MAX_COMMIT_ATTEMPTS; attempt += 1) {
+      const state = normalizeState(current.value);
+      const outcome = apply(state);
+      scope.assertCurrent();
+      if (!outcome.changed) return outcome.result;
+      const applied = await this.store.compareAndApply(key, current.comparison, {
+        operation: "update",
+        action: "set",
+        value: state
+      });
+      scope.assertCurrent();
+      if (applied.status !== "conflict") return outcome.result;
+      current = applied.current;
+    }
+    throw new Error("Could not save tutor changes after concurrent updates. Please try again.");
   }
   merge(state, calendarItems, days) {
     const current = today(this.now(), state.setup.timezone);
@@ -244,38 +262,45 @@ class TutorService {
     };
   }
   async saveSetup(input, scope) {
-    const state = await this.load(scope);
+    let timezone;
     if (input.timezone !== void 0) {
-      if (input.timezone === null || input.timezone.trim() === "") state.setup.timezone = null;
+      if (input.timezone === null || input.timezone.trim() === "") timezone = null;
       else {
         const zone = input.timezone.trim();
         if (!isTimeZone(zone)) throw new Error("timezone must be an IANA name such as America/Halifax, or null to use the gateway host clock.");
-        state.setup.timezone = zone;
+        timezone = zone;
       }
     }
+    let calendarTool;
     if (input.calendarTool !== void 0) {
       const value = input.calendarTool === null ? null : input.calendarTool.trim();
-      state.setup.calendarTool = value ? cleanText(value, "calendarTool", 64) : null;
-      if (state.setup.calendarTool && !/^[A-Za-z][A-Za-z0-9_.:-]*$/.test(state.setup.calendarTool)) {
+      calendarTool = value ? cleanText(value, "calendarTool", 64) : null;
+      if (calendarTool && !/^[A-Za-z][A-Za-z0-9_.:-]*$/.test(calendarTool)) {
         throw new Error("calendarTool must be a tool name, using letters, digits, dots, colons, underscores, or hyphens.");
       }
     }
-    state.setup.updatedAt = new Date(this.now()).toISOString();
-    let reminder;
-    if (!state.setup.calendarTool && !state.setup.calendarReminderShownAt) {
-      state.setup.calendarReminderShownAt = state.setup.updatedAt;
-      reminder = "I can still help with topics and dates you type in, but the two-day study guide needs a calendar. When a calendar tool is available, tell me and I will use it.";
-    }
-    await this.save(state, scope);
-    return {
-      calendarTool: state.setup.calendarTool,
-      timezone: state.setup.timezone,
-      calendarAvailable: Boolean(state.setup.calendarTool),
-      topics: state.topics.length,
-      assessments: state.assessments.length,
-      calendarReminderDue: false,
-      ...reminder === void 0 ? {} : { reminder }
-    };
+    return this.mutateState(scope, (state) => {
+      if (timezone !== void 0) state.setup.timezone = timezone;
+      if (calendarTool !== void 0) state.setup.calendarTool = calendarTool;
+      state.setup.updatedAt = new Date(this.now()).toISOString();
+      let reminder;
+      if (!state.setup.calendarTool && !state.setup.calendarReminderShownAt) {
+        state.setup.calendarReminderShownAt = state.setup.updatedAt;
+        reminder = "I can still help with topics and dates you type in, but the two-day study guide needs a calendar. When a calendar tool is available, tell me and I will use it.";
+      }
+      return {
+        changed: true,
+        result: {
+          calendarTool: state.setup.calendarTool,
+          timezone: state.setup.timezone,
+          calendarAvailable: Boolean(state.setup.calendarTool),
+          topics: state.topics.length,
+          assessments: state.assessments.length,
+          calendarReminderDue: false,
+          ...reminder === void 0 ? {} : { reminder }
+        }
+      };
+    });
   }
   async listTopics(input, scope) {
     const state = await this.load(scope);
@@ -292,19 +317,19 @@ class TutorService {
     const subject = cleanText(input.subject, "subject", 60);
     const title = cleanText(input.title, "title", 120);
     const notes = cleanText(input.notes, "notes", 8e3);
-    const state = await this.load(scope);
     const key = keyOf(subject, title);
-    const index = state.topics.findIndex((topic2) => keyOf(topic2.subject, topic2.title) === key);
-    const updatedAt = new Date(this.now()).toISOString();
-    const topic = index === -1 ? { subject, title, notes, createdAt: updatedAt, updatedAt } : { ...state.topics[index], subject, title, notes, updatedAt };
-    if (index === -1) {
-      if (state.topics.length >= MAX_TOPICS) throw new Error(`At most ${MAX_TOPICS} topics are saved. Remove one first.`);
-      state.topics.push(topic);
-    } else {
-      state.topics[index] = topic;
-    }
-    await this.save(state, scope);
-    return { saved: true, topic: summary(topic), count: state.topics.length };
+    return this.mutateState(scope, (state) => {
+      const index = state.topics.findIndex((topic2) => keyOf(topic2.subject, topic2.title) === key);
+      const updatedAt = new Date(this.now()).toISOString();
+      const topic = index === -1 ? { subject, title, notes, createdAt: updatedAt, updatedAt } : { ...state.topics[index], subject, title, notes, updatedAt };
+      if (index === -1) {
+        if (state.topics.length >= MAX_TOPICS) throw new Error(`At most ${MAX_TOPICS} topics are saved. Remove one first.`);
+        state.topics.push(topic);
+      } else {
+        state.topics[index] = topic;
+      }
+      return { changed: true, result: { saved: true, topic: summary(topic), count: state.topics.length } };
+    });
   }
   async searchTopics(input, scope) {
     const query = cleanText(input.query, "query", 200);
@@ -378,42 +403,42 @@ class TutorService {
     const time = optionalText(input.time, 16);
     if (time !== null && !isTime(time)) throw new Error("time must look like 08:05 or 8:05 AM.");
     const notes = optionalText(input.notes, 1e3) ?? "";
-    const state = await this.load(scope);
     const key = keyOf(subject, title);
-    const index = state.assessments.findIndex((assessment2) => keyOf(assessment2.subject, assessment2.title) === key);
-    const updatedAt = new Date(this.now()).toISOString();
-    const assessment = index === -1 ? { subject, title, date: input.date, time, notes, createdAt: updatedAt, updatedAt } : { ...state.assessments[index], date: input.date, time, notes, updatedAt };
-    if (index === -1) {
-      if (state.assessments.length >= MAX_ASSESSMENTS) throw new Error(`At most ${MAX_ASSESSMENTS} assessments are saved. Remove one first.`);
-      state.assessments.push(assessment);
-    } else {
-      state.assessments[index] = assessment;
-    }
-    await this.save(state, scope);
-    return { saved: true, assessment, count: state.assessments.length };
+    return this.mutateState(scope, (state) => {
+      const index = state.assessments.findIndex((assessment2) => keyOf(assessment2.subject, assessment2.title) === key);
+      const updatedAt = new Date(this.now()).toISOString();
+      const assessment = index === -1 ? { subject, title, date: input.date, time, notes, createdAt: updatedAt, updatedAt } : { ...state.assessments[index], date: input.date, time, notes, updatedAt };
+      if (index === -1) {
+        if (state.assessments.length >= MAX_ASSESSMENTS) throw new Error(`At most ${MAX_ASSESSMENTS} assessments are saved. Remove one first.`);
+        state.assessments.push(assessment);
+      } else {
+        state.assessments[index] = assessment;
+      }
+      return { changed: true, result: { saved: true, assessment, count: state.assessments.length } };
+    });
   }
   async deleteTopic(input, scope) {
     const subject = cleanText(input.subject, "subject", 60);
     const title = cleanText(input.title, "title", 120);
-    const state = await this.load(scope);
     const key = keyOf(subject, title);
-    const index = state.topics.findIndex((topic) => keyOf(topic.subject, topic.title) === key);
-    if (index === -1) return { removed: false, note: "No saved topic matched that subject and title." };
-    const [removed] = state.topics.splice(index, 1);
-    await this.save(state, scope);
-    return { removed: true, topic: summary(removed), count: state.topics.length };
+    return this.mutateState(scope, (state) => {
+      const index = state.topics.findIndex((topic) => keyOf(topic.subject, topic.title) === key);
+      if (index === -1) return { changed: false, result: { removed: false, note: "No saved topic matched that subject and title." } };
+      const [removed] = state.topics.splice(index, 1);
+      return { changed: true, result: { removed: true, topic: summary(removed), count: state.topics.length } };
+    });
   }
   async deleteAssessment(input, scope) {
     const subject = cleanText(input.subject, "subject", 60);
     const title = cleanText(input.title, "title", 120);
-    const state = await this.load(scope);
     const key = keyOf(subject, title);
-    const index = state.assessments.findIndex((assessment) => keyOf(assessment.subject, assessment.title) === key);
-    if (index === -1) return { removed: false, note: "No saved assessment matched that subject and title." };
-    const [removed] = state.assessments.splice(index, 1);
-    state.guides = state.guides.filter((guide) => keyOf(guide.subject, guide.title) !== key);
-    await this.save(state, scope);
-    return { removed: true, assessment: removed, count: state.assessments.length };
+    return this.mutateState(scope, (state) => {
+      const index = state.assessments.findIndex((assessment) => keyOf(assessment.subject, assessment.title) === key);
+      if (index === -1) return { changed: false, result: { removed: false, note: "No saved assessment matched that subject and title." } };
+      const [removed] = state.assessments.splice(index, 1);
+      state.guides = state.guides.filter((guide) => keyOf(guide.subject, guide.title) !== key);
+      return { changed: true, result: { removed: true, assessment: removed, count: state.assessments.length } };
+    });
   }
   topicsFor(state, assessment) {
     const exact = state.topics.filter((topic) => normalize(topic.subject) === normalize(assessment.subject));
@@ -478,36 +503,44 @@ ${note}`);
     };
   }
   async getDueStudyGuides(input, scope) {
-    const state = await this.load(scope);
-    const calendar = cleanCalendar(input.calendarItems, today(this.now(), state.setup.timezone));
-    const merged = this.merge(state, calendar.items, DUE_DAYS);
-    const due = merged.items.filter((assessment) => assessment.date >= merged.current && assessment.date <= merged.end);
-    const before = state.guides.length;
-    state.guides = state.guides.filter((guide) => guide.date >= merged.current).slice(-MAX_GUIDES);
-    const guides = due.map((assessment) => {
-      const key = keyOf(assessment.subject, assessment.title, assessment.date);
-      const existing = state.guides.find((guide) => guide.key === key && guide.date === assessment.date);
-      if (existing) return { ...existing, reused: true };
-      const built = this.buildGuide(state, assessment);
-      state.guides.push(built);
-      return { ...built, reused: false };
+    if (input.calendarItems && input.calendarItems.length > MAX_CALENDAR_ITEMS) {
+      throw new Error(`calendarItems is limited to ${MAX_CALENDAR_ITEMS} items.`);
+    }
+    return this.mutateState(scope, (state) => {
+      const calendar = cleanCalendar(input.calendarItems, today(this.now(), state.setup.timezone));
+      const merged = this.merge(state, calendar.items, DUE_DAYS);
+      const due = merged.items.filter((assessment) => assessment.date >= merged.current && assessment.date <= merged.end);
+      const before = state.guides.length;
+      state.guides = state.guides.filter((guide) => guide.date >= merged.current).slice(-MAX_GUIDES);
+      const guides = due.map((assessment) => {
+        const key = keyOf(assessment.subject, assessment.title, assessment.date);
+        const existing = state.guides.find((guide) => guide.key === key && guide.date === assessment.date);
+        if (existing) return { ...existing, reused: true };
+        const built = this.buildGuide(state, assessment);
+        state.guides.push(built);
+        return { ...built, reused: false };
+      });
+      state.guides = state.guides.slice(-MAX_GUIDES);
+      const changed = guides.some((guide) => !guide.reused) || state.guides.length !== before;
+      return {
+        changed,
+        result: {
+          today: merged.current,
+          dueWindow: { from: merged.current, through: merged.end },
+          guides,
+          calendarItemsConsidered: calendar.items.length,
+          skippedCalendarItems: calendar.skipped,
+          note: guides.length ? "A stored guide is returned unchanged until its assessment date passes. Use it as a starting point, not a finished assignment." : "No assessment is in the next two days. Keep using topic search; a guide is built when one is due."
+        }
+      };
     });
-    state.guides = state.guides.slice(-MAX_GUIDES);
-    if (guides.some((guide) => !guide.reused) || state.guides.length !== before) await this.save(state, scope);
-    return {
-      today: merged.current,
-      dueWindow: { from: merged.current, through: merged.end },
-      guides,
-      calendarItemsConsidered: calendar.items.length,
-      skippedCalendarItems: calendar.skipped,
-      note: guides.length ? "A stored guide is returned unchanged until its assessment date passes. Use it as a starting point, not a finished assignment." : "No assessment is in the next two days. Keep using topic search; a guide is built when one is due."
-    };
   }
 }
 export {
   DUE_DAYS,
   MAX_ASSESSMENTS,
   MAX_CALENDAR_ITEMS,
+  MAX_COMMIT_ATTEMPTS,
   MAX_GUIDES,
   MAX_TOPICS,
   TutorService,
